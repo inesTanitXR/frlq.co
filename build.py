@@ -363,7 +363,7 @@ TEAM = [
 NEWS = json.load(open(os.path.join(ASSETS, 'news', 'news.json')))
 
 LOGOS = ["smithsonian.png", "oracle.png", "exelon.png", "smud.png", "vistra.png",
-         "ameren.png", "austin-energy.svg", "cps.svg", "bge.svg", "nrel.svg", "sew.svg"]
+         "ameren.png", "austin-energy.png", "cps.png", "bge.png", "nrel.png", "sew.png"]
 
 SOCIALS = [
     ("LinkedIn", "https://linkedin.com/company/froliqmedia"),
