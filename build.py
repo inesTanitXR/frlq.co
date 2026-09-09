@@ -506,7 +506,7 @@ NAV_ITEMS = [("work", "Work"), ("apps", "Apps"), ("services", "Services"),
 
 DEFAULT_DESC = ("Froliq is an Austin XR studio building digital twins, VR safety training, 3D scanning, "
                 "and educational AR/VR games for utilities, museums, and communities.")
-OG_IMAGE = f"{SITE_URL}/assets/featured/smithsonian.jpg"
+OG_IMAGE = f"{SITE_URL}/assets/og.png"
 
 ORG_LD = json.dumps({
     "@context": "https://schema.org", "@type": "Organization",
@@ -571,7 +571,7 @@ def shell(title, body, active, inline, desc=DEFAULT_DESC, path="", og_image=OG_I
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
 <meta property="og:url" content="{canonical}">
-<meta property="og:image" content="{og_image}">
+<meta property="og:image" content="{og_image}">{'<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">' if og_image == OG_IMAGE else ''}
 <meta name="twitter:card" content="summary_large_image">
 {ld}
 {FONTS}
@@ -1009,6 +1009,7 @@ def main():
         shutil.copytree(os.path.join(ASSETS, sub), os.path.join(OUT, 'assets', sub))
     os.remove(os.path.join(OUT, 'assets', 'news', 'news.json'))
     shutil.copy(os.path.join(ASSETS, 'froliq-logo.svg'), os.path.join(OUT, 'assets'))
+    shutil.copy(os.path.join(ASSETS, 'og.png'), os.path.join(OUT, 'assets'))
 
     pages = all_pages()
     for key, fn in pages.items():
