@@ -192,6 +192,7 @@ a.tcard{background:var(--card);border:1px solid var(--line);border-radius:20px;p
 a.tcard:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
 .av{flex:none;width:58px;height:58px;border-radius:50%;background:var(--grad);color:#fff;display:grid;place-items:center;
   font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:19px}
+img.av-photo{object-fit:cover;border:3px solid var(--card);box-shadow:0 6px 18px rgba(25,16,54,.18)}
 .tcard b{display:block;color:var(--ink);font-size:19px;font-family:"Bricolage Grotesque",sans-serif}
 .tcard .role{font-size:14px;color:var(--muted)}
 .tcard p{font-size:14.5px;margin:0;color:var(--body)}
@@ -598,9 +599,17 @@ def app_card(p, inline):
             f'<div class="meta"><b>{p["title"]}</b><span class="{cls}">{p["xr"]}</span></div></a>')
 
 
+def avatar(m, inline, cls="av"):
+    photo = os.path.join(ASSETS, 'team', f"{m['slug']}.jpg")
+    if os.path.exists(photo):
+        return (f'<img class="{cls} av-photo" src="{img_src("team", m["slug"] + ".jpg", inline)}" '
+                f'alt="{m["name"]}" loading="lazy">')
+    return f'<span class="{cls}">{m["init"]}</span>'
+
+
 def team_card(m, inline):
     return (f'<a class="tcard" href="{href("team-" + m["slug"], inline)}">'
-            f'<span class="av">{m["init"]}</span><span><b>{m["name"]}</b>'
+            f'{avatar(m, inline)}<span><b>{m["name"]}</b>'
             f'<span class="role">{m["role"]}</span></span>'
             f'<p>{m["paras"][0]}</p><span class="go">Meet {m["name"].split()[0]} →</span></a>')
 
@@ -766,7 +775,7 @@ def page_member(m, inline):
     body = f"""
 <div class="detail">
   <div class="detail-head">
-    <div class="member-head"><span class="av">{m["init"]}</span>
+    <div class="member-head">{avatar(m, inline)}
       <div><p class="eyebrow" style="margin-bottom:6px">{m["role"]}</p><h1 style="margin:0">{m["name"]}</h1></div>
     </div>
     <div class="pills" style="margin-top:14px">{pills}</div>
@@ -823,7 +832,7 @@ def page_article(a, inline):
 
 def page_about(inline):
     minis = "".join(
-        f'<a class="member" href="{href("team-" + m["slug"], inline)}"><span class="av">{m["init"]}</span>'
+        f'<a class="member" href="{href("team-" + m["slug"], inline)}">{avatar(m, inline)}'
         f'<span><b>{m["name"]}</b><span>{m["role"]}</span></span></a>'
         for m in TEAM[:4])
     body = f"""
@@ -961,7 +970,7 @@ def main():
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     os.makedirs(os.path.join(OUT, 'assets'))
-    for sub in ('work', 'featured', 'logos', 'news'):
+    for sub in ('work', 'featured', 'logos', 'news', 'team'):
         shutil.copytree(os.path.join(ASSETS, sub), os.path.join(OUT, 'assets', sub))
     os.remove(os.path.join(OUT, 'assets', 'news', 'news.json'))
     shutil.copy(os.path.join(ASSETS, 'froliq-logo.svg'), os.path.join(OUT, 'assets'))
