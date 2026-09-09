@@ -35,7 +35,7 @@ CSS = r"""
   --grad:linear-gradient(115deg,#9b02ff 10%,#20bdff 90%);
   --shadow:0 14px 40px rgba(45,20,90,.10);
   --nav-bg:rgba(247,245,252,.82);
-  --chip-bg:#ffffff;
+  --chip-bg:transparent;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -136,9 +136,9 @@ section{padding:64px 0}
 /* client logo strip */
 .clients{padding:34px 0 42px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .clients .label{text-align:center;font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:20px}
-.logo-row{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
-.logo-chip{background:var(--chip-bg);border:1px solid var(--line);border-radius:14px;padding:12px 20px;display:flex;align-items:center;justify-content:center}
-.logo-chip img{height:34px;width:auto;max-width:150px;object-fit:contain}
+.logo-row{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 26px;align-items:center}
+.logo-chip{background:var(--chip-bg);border-radius:14px;padding:10px 16px;display:flex;align-items:center;justify-content:center}
+.logo-chip img{height:38px;width:auto;max-width:170px;object-fit:contain}
 
 /* services */
 .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
