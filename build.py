@@ -166,10 +166,12 @@ a.work:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
   background:var(--card-2);border-radius:999px;padding:6px 13px;margin:0 6px 6px 0}
 .pill-grad{background:var(--grad);color:#fff}
 .work-hero{grid-column:1/-1;flex-direction:row}
-.work-hero>img{width:44%;aspect-ratio:auto;min-height:100%}
+.work-hero .shot{flex:0 0 44%;position:relative;min-height:300px}
+.work-hero .shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .work-hero .body{padding:30px 32px}
 .work-hero h3{font-size:28px}
-@media(max-width:860px){.work-grid{grid-template-columns:1fr}.work-hero{flex-direction:column}.work-hero>img{width:100%;aspect-ratio:16/9;min-height:0}}
+@media(max-width:860px){.work-grid{grid-template-columns:1fr}.work-hero{flex-direction:column}
+  .work-hero .shot{flex:auto;width:100%;min-height:0;aspect-ratio:16/9}}
 
 /* app grid */
 .lib-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
@@ -590,8 +592,11 @@ def work_card(p, inline, hero=False):
         pills += '<span class="pill pill-grad">▶ Video</span>'
     cls = "work work-hero" if hero else "work"
     f, fn = p["img"]
+    img_tag = f'<img src="{img_src(f, fn, inline)}" alt="{p["client"]} — {p["title"]}" loading="lazy">'
+    if hero:
+        img_tag = f'<span class="shot">{img_tag}</span>'
     return (f'<a class="{cls}" href="{href("project-" + p["slug"], inline)}">'
-            f'<img src="{img_src(f, fn, inline)}" alt="{p["client"]} — {p["title"]}" loading="lazy">'
+            f'{img_tag}'
             f'<div class="body"><span class="client">{p["client"]}</span><h3>{p["title"]}</h3>'
             f'<p>{p["card"]}</p><div class="pills">{pills}</div></div></a>')
 
