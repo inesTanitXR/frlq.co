@@ -950,6 +950,20 @@ def build_preview(pages):
 </script>"""
     html = shell("Froliq | VR & AR Training for Energy and Utilities",
                  "\n".join(sections) + router, None, inline=True)
+
+    # Dedupe repeated data-URIs: store each unique image once, hydrate at runtime.
+    import re as _re
+    uris = {}
+    def _key(m):
+        uri = m.group(1)
+        if uri not in uris:
+            uris[uri] = f"i{len(uris)}"
+        return f'data-u="{uris[uri]}" src=""'
+    html = _re.sub(r'src="(data:image/[^"]+)"', _key, html)
+    blob = json.dumps({v: k for k, v in uris.items()})
+    hydrate = ('<script>const __U=' + blob +
+               ';document.querySelectorAll("img[data-u]").forEach(i=>{i.src=__U[i.dataset.u]});</script>')
+    html = html.replace('</body>', hydrate + '\n</body>')
     open(os.path.join(ROOT, 'preview.html'), 'w').write(html)
 
 
