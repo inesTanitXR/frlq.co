@@ -188,8 +188,12 @@ a.app:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
 
 /* team */
 .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-a.tcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px;text-decoration:none;display:flex;flex-direction:column;gap:12px;transition:transform .18s ease,box-shadow .18s ease}
+a.tcard{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;text-decoration:none;display:flex;flex-direction:column;transition:transform .18s ease,box-shadow .18s ease}
 a.tcard:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.tphoto{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.tphoto-init{width:100%;aspect-ratio:1/1;background:var(--grad);color:#fff;display:grid;place-items:center;
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:64px}
+.tcard .tbody{padding:18px 22px 22px;display:flex;flex-direction:column;gap:10px;flex:1}
 .av{flex:none;width:58px;height:58px;border-radius:50%;background:var(--grad);color:#fff;display:grid;place-items:center;
   font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:19px}
 img.av-photo{object-fit:cover;border:3px solid var(--card);box-shadow:0 6px 18px rgba(25,16,54,.18)}
@@ -198,8 +202,11 @@ img.av-photo{object-fit:cover;border:3px solid var(--card);box-shadow:0 6px 18px
 .tcard p{font-size:14.5px;margin:0;color:var(--body)}
 .tcard .go{margin-top:auto;padding-top:8px;font-weight:600;color:var(--purple);font-size:14.5px}
 @media(max-width:860px){.team-grid{grid-template-columns:1fr}}
-.member-head{display:flex;gap:20px;align-items:center;margin-bottom:8px}
-.member-head .av{width:84px;height:84px;font-size:28px}
+.member-head{display:grid;grid-template-columns:300px 1fr;gap:34px;align-items:center;margin-bottom:8px}
+.member-photo{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:24px;border:1px solid var(--line);box-shadow:var(--shadow)}
+.member-photo-init{width:100%;aspect-ratio:1/1;border-radius:24px;background:var(--grad);color:#fff;display:grid;place-items:center;
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:84px}
+@media(max-width:680px){.member-head{grid-template-columns:1fr}.member-photo,.member-photo-init{max-width:340px}}
 .link-row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 0}
 .link-row a{font-family:"IBM Plex Mono",monospace;font-size:13px;text-decoration:none;color:var(--ink);
   border:1.5px solid var(--line);border-radius:999px;padding:7px 15px;background:var(--card)}
@@ -607,11 +614,20 @@ def avatar(m, inline, cls="av"):
     return f'<span class="{cls}">{m["init"]}</span>'
 
 
+def big_photo(m, inline, cls, init_cls):
+    photo = os.path.join(ASSETS, 'team', f"{m['slug']}.jpg")
+    if os.path.exists(photo):
+        return (f'<img class="{cls}" src="{img_src("team", m["slug"] + ".jpg", inline)}" '
+                f'alt="{m["name"]} — {m["role"]}" loading="lazy">')
+    return f'<span class="{init_cls}">{m["init"]}</span>'
+
+
 def team_card(m, inline):
     return (f'<a class="tcard" href="{href("team-" + m["slug"], inline)}">'
-            f'{avatar(m, inline)}<span><b>{m["name"]}</b>'
+            f'{big_photo(m, inline, "tphoto", "tphoto-init")}'
+            f'<span class="tbody"><span><b>{m["name"]}</b>'
             f'<span class="role">{m["role"]}</span></span>'
-            f'<p>{m["paras"][0]}</p><span class="go">Meet {m["name"].split()[0]} →</span></a>')
+            f'<p>{m["paras"][0]}</p><span class="go">Meet {m["name"].split()[0]} →</span></span></a>')
 
 
 def news_card(a, inline):
@@ -775,10 +791,10 @@ def page_member(m, inline):
     body = f"""
 <div class="detail">
   <div class="detail-head">
-    <div class="member-head">{avatar(m, inline)}
-      <div><p class="eyebrow" style="margin-bottom:6px">{m["role"]}</p><h1 style="margin:0">{m["name"]}</h1></div>
+    <div class="member-head">{big_photo(m, inline, "member-photo", "member-photo-init")}
+      <div><p class="eyebrow" style="margin-bottom:6px">{m["role"]}</p><h1 style="margin:0">{m["name"]}</h1>
+      <div class="pills" style="margin-top:16px">{pills}</div></div>
     </div>
-    <div class="pills" style="margin-top:14px">{pills}</div>
   </div>
   <div class="prose">{prose}</div>
   {link_row}

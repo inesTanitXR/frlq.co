@@ -177,8 +177,12 @@ a.app:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
 
 /* team */
 .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-a.tcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px;text-decoration:none;display:flex;flex-direction:column;gap:12px;transition:transform .18s ease,box-shadow .18s ease}
+a.tcard{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;text-decoration:none;display:flex;flex-direction:column;transition:transform .18s ease,box-shadow .18s ease}
 a.tcard:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.tphoto{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.tphoto-init{width:100%;aspect-ratio:1/1;background:var(--grad);color:#fff;display:grid;place-items:center;
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:64px}
+.tcard .tbody{padding:18px 22px 22px;display:flex;flex-direction:column;gap:10px;flex:1}
 .av{flex:none;width:58px;height:58px;border-radius:50%;background:var(--grad);color:#fff;display:grid;place-items:center;
   font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:19px}
 img.av-photo{object-fit:cover;border:3px solid var(--card);box-shadow:0 6px 18px rgba(25,16,54,.18)}
@@ -187,8 +191,11 @@ img.av-photo{object-fit:cover;border:3px solid var(--card);box-shadow:0 6px 18px
 .tcard p{font-size:14.5px;margin:0;color:var(--body)}
 .tcard .go{margin-top:auto;padding-top:8px;font-weight:600;color:var(--purple);font-size:14.5px}
 @media(max-width:860px){.team-grid{grid-template-columns:1fr}}
-.member-head{display:flex;gap:20px;align-items:center;margin-bottom:8px}
-.member-head .av{width:84px;height:84px;font-size:28px}
+.member-head{display:grid;grid-template-columns:300px 1fr;gap:34px;align-items:center;margin-bottom:8px}
+.member-photo{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:24px;border:1px solid var(--line);box-shadow:var(--shadow)}
+.member-photo-init{width:100%;aspect-ratio:1/1;border-radius:24px;background:var(--grad);color:#fff;display:grid;place-items:center;
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:84px}
+@media(max-width:680px){.member-head{grid-template-columns:1fr}.member-photo,.member-photo-init{max-width:340px}}
 .link-row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 0}
 .link-row a{font-family:"IBM Plex Mono",monospace;font-size:13px;text-decoration:none;color:var(--ink);
   border:1.5px solid var(--line);border-radius:999px;padding:7px 15px;background:var(--card)}
