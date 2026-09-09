@@ -2,18 +2,22 @@
 """Build frlq.co — multi-page static site aligned with the 2026 Froliq story.
 
 Outputs:
-  docs/        — index/work/apps/services/about/contact.html,
-                 project-<slug>.html detail pages, 404.html, assets/
+  docs/        — index/work/apps/services/team/news/about/contact.html,
+                 project-*.html, team-*.html, news-*.html detail pages,
+                 404.html, sitemap.xml, robots.txt, assets/
   preview.html — single-file version with hash routing + data-URI images
 
 Brand: Froliq logo purple #9b02ff -> blue #20bdff.
 Type:  Bricolage Grotesque (display) / Instrument Sans (body) / IBM Plex Mono (labels).
 """
-import base64, mimetypes, os, shutil
+import base64, json, mimetypes, os, shutil
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 ASSETS = os.path.join(ROOT, 'assets')
 OUT = os.path.join(ROOT, 'docs')
+
+# Switch to "https://frlq.co" at DNS cutover.
+SITE_URL = "https://inestanitxr.github.io/frlq.co"
 
 LOGO_SVG = open(os.path.join(ASSETS, 'froliq-logo.svg')).read()
 LOGO_SVG = LOGO_SVG.replace('id="Layer_1-534353042"', 'class="logo-mark" aria-hidden="true"')
@@ -82,10 +86,9 @@ section{padding:64px 0}
 
 /* nav */
 .nav{position:sticky;top:0;z-index:50;background:var(--nav-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-.nav-in{display:flex;align-items:center;gap:24px;height:66px}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;margin-right:auto}
-.brand svg{height:30px;width:auto}
-.brand b{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:21px;letter-spacing:.01em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nav-in{display:flex;align-items:center;gap:22px;height:66px}
+.brand{display:flex;align-items:center;text-decoration:none;margin-right:auto}
+.brand svg{height:38px;width:auto}
 .nav a.lnk{text-decoration:none;color:var(--body);font-weight:500;font-size:15px;padding:4px 2px;border-bottom:2px solid transparent}
 .nav a.lnk:hover{color:var(--ink)}
 .nav a.lnk.on{color:var(--ink);border-bottom-color:var(--purple)}
@@ -96,7 +99,7 @@ section{padding:64px 0}
 .btn-ghost{border:1.5px solid var(--line);color:var(--ink);background:var(--card)}
 .btn-ghost:hover{border-color:var(--purple)}
 .nav .btn{padding:9px 18px}
-@media(max-width:900px){.nav a.lnk{display:none}.nav-mob{display:flex !important}}
+@media(max-width:980px){.nav a.lnk{display:none}.nav-mob{display:flex !important}}
 .nav-mob{display:none;gap:16px;overflow-x:auto;padding:10px 24px;border-top:1px solid var(--line)}
 .nav-mob a{text-decoration:none;color:var(--body);font-weight:500;font-size:14px;white-space:nowrap}
 
@@ -105,19 +108,26 @@ section{padding:64px 0}
 .page-head p.sub{font-size:18.5px;max-width:620px;color:var(--body)}
 
 /* hero (home) */
-.hero{position:relative;padding:88px 0 64px;overflow:hidden}
-.hero::before{content:"";position:absolute;inset:0;z-index:-1;
+.hero{position:relative;padding:80px 0 64px;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;z-index:0;
   background-image:radial-gradient(var(--line) 1.2px, transparent 1.2px);
   background-size:26px 26px;
   -webkit-mask-image:radial-gradient(720px 460px at 74% 10%,#000 0%,transparent 72%);
   mask-image:radial-gradient(720px 460px at 74% 10%,#000 0%,transparent 72%);
 }
-.hero::after{content:"";position:absolute;z-index:-2;width:560px;height:560px;right:-160px;top:-220px;border-radius:50%;
-  background:radial-gradient(closest-side,var(--purple-soft),transparent 70%)}
-.hero h1{max-width:760px}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center}
 .hero .lede{font-size:19.5px;max-width:620px;color:var(--body)}
 .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin:30px 0 0}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:56px}
+.collage{position:relative;min-height:420px}
+.collage img{position:absolute;border-radius:18px;border:5px solid var(--card);box-shadow:0 18px 50px rgba(25,16,54,.22);object-fit:cover}
+.collage .c1{width:66%;aspect-ratio:4/3.4;right:4%;top:0;transform:rotate(2.2deg)}
+.collage .c2{width:52%;aspect-ratio:16/10;left:0;top:44%;transform:rotate(-2.5deg);z-index:2}
+.collage .c3{width:44%;aspect-ratio:1/1;right:0;top:56%;transform:rotate(1.5deg)}
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr}
+  .collage{min-height:0;height:340px;margin-top:8px}
+}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:56px;position:relative;z-index:1}
 .stat{border-top:2.5px solid transparent;border-image:var(--grad) 1;padding-top:16px}
 .stat b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:32px;color:var(--ink);font-variant-numeric:tabular-nums}
 .stat span{font-size:13.5px;color:var(--muted)}
@@ -176,6 +186,35 @@ a.app:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
 .app .xr.ar{background:var(--blue)}
 @media(max-width:980px){.lib-grid{grid-template-columns:repeat(2,1fr)}}
 
+/* team */
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+a.tcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px;text-decoration:none;display:flex;flex-direction:column;gap:12px;transition:transform .18s ease,box-shadow .18s ease}
+a.tcard:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.av{flex:none;width:58px;height:58px;border-radius:50%;background:var(--grad);color:#fff;display:grid;place-items:center;
+  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:19px}
+.tcard b{display:block;color:var(--ink);font-size:19px;font-family:"Bricolage Grotesque",sans-serif}
+.tcard .role{font-size:14px;color:var(--muted)}
+.tcard p{font-size:14.5px;margin:0;color:var(--body)}
+.tcard .go{margin-top:auto;padding-top:8px;font-weight:600;color:var(--purple);font-size:14.5px}
+@media(max-width:860px){.team-grid{grid-template-columns:1fr}}
+.member-head{display:flex;gap:20px;align-items:center;margin-bottom:8px}
+.member-head .av{width:84px;height:84px;font-size:28px}
+.link-row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 0}
+.link-row a{font-family:"IBM Plex Mono",monospace;font-size:13px;text-decoration:none;color:var(--ink);
+  border:1.5px solid var(--line);border-radius:999px;padding:7px 15px;background:var(--card)}
+.link-row a:hover{border-color:var(--purple);color:var(--purple)}
+
+/* news */
+.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+a.ncard{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;text-decoration:none;display:flex;flex-direction:column;transition:transform .18s ease,box-shadow .18s ease}
+a.ncard:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.ncard img{width:100%;aspect-ratio:16/9;object-fit:cover}
+.ncard .body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:8px;flex:1}
+.ncard time{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);letter-spacing:.08em}
+.ncard b{font-size:17px;color:var(--ink);font-family:"Bricolage Grotesque",sans-serif;line-height:1.3}
+.ncard p{font-size:14px;margin:0;color:var(--body)}
+@media(max-width:980px){.news-grid{grid-template-columns:1fr}}
+
 /* process */
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;counter-reset:step}
 .step{position:relative;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px}
@@ -186,17 +225,16 @@ a.app:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
 .step p{font-size:15px;margin:0;color:var(--body)}
 @media(max-width:860px){.steps{grid-template-columns:1fr}}
 
-/* about / team */
+/* about */
 .about-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:start}
-.team{display:grid;grid-template-columns:1fr;gap:14px}
-.member{display:flex;gap:13px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
-.member .av{flex:none;width:46px;height:46px;border-radius:50%;background:var(--grad);color:#fff;display:grid;place-items:center;
-  font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:16px}
+.member{display:flex;gap:13px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;text-decoration:none}
+.member .av{width:46px;height:46px;font-size:16px}
 .member b{display:block;color:var(--ink);font-size:15.5px}
 .member span{font-size:13.5px;color:var(--muted)}
+.team-mini{display:grid;grid-template-columns:1fr;gap:12px}
 @media(max-width:860px){.about-grid{grid-template-columns:1fr}}
 
-/* project detail */
+/* project / article detail */
 .detail{max-width:860px;margin:0 auto;padding:0 24px}
 .detail-head{padding:56px 0 26px}
 .detail-hero{border-radius:22px;overflow:hidden;border:1px solid var(--line);margin-bottom:30px}
@@ -213,6 +251,7 @@ a.app:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
 .back-row{padding:22px 0 0;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
 .detail-cta{margin:44px 0 64px;background:var(--card-2);border:1px solid var(--line);border-radius:22px;padding:30px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
 .detail-cta b{font-family:"Bricolage Grotesque",sans-serif;font-size:21px;color:var(--ink)}
+.src-note{font-size:13.5px;color:var(--muted)}
 
 /* contact */
 .cta{background:var(--ink);border-radius:28px;padding:64px 40px;text-align:center;position:relative;overflow:hidden}
@@ -237,7 +276,7 @@ footer a:hover{color:var(--ink)}
 a:focus-visible,.btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:8px}
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto}
-  .btn,a.app,a.work,.work::after{transition:none}
+  .btn,a.app,a.work,a.tcard,a.ncard,.work::after{transition:none}
 }
 """
 
@@ -271,12 +310,56 @@ STEPS = [
 ]
 
 TEAM = [
-    ("Jason Rodriguez", "Co-Founder & CEO", "JR"),
-    ("Mark Ishac", "Creative Lead", "MI"),
-    ("Ines Said", "Lead XR Developer", "IS"),
-    ("Kelly Zhang", "3D Designer / Developer", "KZ"),
-    ("Sam Kodo", "Sr. Software Engineer", "SK"),
+    dict(slug="jason-rodriguez", name="Jason Rodriguez", role="CEO & Co-Founder", init="JR",
+         links=[("LinkedIn", "https://www.linkedin.com/in/zpxr/")],
+         pills=["Zpryme co-founder", "Energy Thought Summit"],
+         paras=[
+             "Jason leads Froliq's mission: accelerating clean-energy workforce development and training with virtual and augmented reality.",
+             "He's also CEO and co-founder of Zpryme, the Austin research, media, and events company Froliq grew out of — where his team's research has been cited by the New York Times and Fast Company, and where he oversees the Energy Thought Summit, one of the premier energy events in the nation.",
+             "If Froliq is showing up at your event with a crate of headsets, Jason probably made it happen."]),
+    dict(slug="mark-ishac", name="Mark Ishac", role="XR Creative Lead & Managing Director", init="MI",
+         links=[("LinkedIn", "https://www.linkedin.com/in/markishac/")],
+         pills=["Creative direction", "MBA · MS MIS"],
+         paras=[
+             "Mark steers the look, feel, and story of every Froliq experience — navigating emerging technologies to build engaging, educational applications for business and consumer audiences alike.",
+             "He doubles as Chief Creative Officer at Zpryme, where he's shaped influential research and premium branding for the energy industry.",
+             "Mark holds an MBA and a Master's in Management Information Systems from the University of South Florida, and a BS from the University of Florida's Warrington College of Business."]),
+    dict(slug="ines-said", name="Ines Said", role="Lead XR Developer", init="IS",
+         links=[("LinkedIn", "https://www.linkedin.com/in/inessaid/"),
+                ("Website", "https://www.inessaid.com"), ("Tanit XR", "https://tanitxr.org")],
+         pills=["EE 30 Under 30", "Auggie Awards finalist", "IEEE Best Paper"],
+         paras=[
+             "Ines works across every part of the development process, combining art and technology to turn overwhelming topics into experiences you can step inside and interact with.",
+             "She was named to NAAEE's EE 30 Under 30 (Class of 2025), is a 2026 Auggie Awards finalist for Best Societal Impact, and holds an IEEE Best Paper Award and the GFAA Biennial Excellence Award. She speaks English, Arabic, and French.",
+             "Outside Froliq, she's the founder of Tanit XR, a project preserving Tunisia's cultural heritage through 3D scanning and immersive technology — the same reality-capture skills she brings to power plants."]),
+    dict(slug="kelly-zhang", name="Kelly Zhang", role="3D Designer / Developer", init="KZ",
+         links=[("LinkedIn", "https://www.linkedin.com/in/kelly5zhang/"),
+                ("ArtStation", "https://www.artstation.com/kellyzhang324")],
+         pills=["3D art + development", "Impact producer"],
+         paras=[
+             "Kelly builds the worlds: 3D design, animation, and development across Froliq's VR and AR experiences.",
+             "An impact producer and XR designer-developer, she moves comfortably from modeling and texturing to shipping the build — the reason Froliq's virtual landfills, wind farms, and living rooms feel like places, not menus."]),
+    dict(slug="benito-ramirez", name="Benito Ramirez", role="Account Manager", init="BR",
+         links=[],
+         pills=["Client partnerships"],
+         paras=[
+             "Benito keeps Froliq's client projects moving — the partner-facing side of every engagement, from first call to on-site delivery.",
+             "Austin-based, he works across both Froliq and Zpryme, which means he's usually the first person our utility partners meet and the one who makes sure nothing falls through the cracks."]),
+    dict(slug="anthony-cole", name="Anthony Cole", role="Technology Associate", init="AC",
+         links=[],
+         pills=["Builds · deployments · events"],
+         paras=[
+             "Anthony supports Froliq's builds, deployments, and events — the hands-on work that gets an experience from the studio into a headset at a career fair.",
+             "He came up through Zpryme's marketing side, so he brings a communicator's eye to the technology table."]),
+    dict(slug="brandon-francis", name="Brandon Francis", role="VR Demos & Development", init="BF",
+         links=[],
+         pills=["BGE workforce demos"],
+         paras=[
+             "Brandon builds and runs Froliq's VR demos — including workforce-development work with Baltimore Gas and Electric — making sure the experience lands the moment someone puts on the headset.",
+             "Live demos are where XR is won or lost, and Brandon is the reason Froliq's booth always has a line."]),
 ]
+
+NEWS = json.load(open(os.path.join(ASSETS, 'news', 'news.json')))
 
 LOGOS = ["smithsonian.png", "oracle.png", "exelon.png", "smud.png", "vistra.png",
          "ameren.png", "austin-energy.svg", "cps.svg", "bge.svg", "nrel.svg", "sew.svg"]
@@ -288,7 +371,6 @@ SOCIALS = [
     ("Facebook", "https://facebook.com/froliqmedia"),
 ]
 
-# featured=True projects render as big cards on work.html; others on apps.html
 PROJECTS = [
     dict(slug="smithsonian-futures", featured=True, hero_card=True,
          client="Smithsonian × Oracle", title="FUTURES Exhibit VR", xr="VR",
@@ -410,7 +492,22 @@ PROJECTS = [
 ]
 
 NAV_ITEMS = [("work", "Work"), ("apps", "Apps"), ("services", "Services"),
-             ("about", "About"), ("contact", "Contact")]
+             ("team", "Team"), ("news", "News"), ("about", "About"), ("contact", "Contact")]
+
+DEFAULT_DESC = ("Froliq is an Austin XR studio building digital twins, VR safety training, 3D scanning, "
+                "and educational AR/VR games for utilities, museums, and communities.")
+OG_IMAGE = f"{SITE_URL}/assets/featured/smithsonian.jpg"
+
+ORG_LD = json.dumps({
+    "@context": "https://schema.org", "@type": "Organization",
+    "name": "Froliq", "url": SITE_URL, "logo": f"{SITE_URL}/assets/froliq-logo.svg",
+    "description": DEFAULT_DESC,
+    "address": {"@type": "PostalAddress", "addressLocality": "Austin", "addressRegion": "TX", "addressCountry": "US"},
+    "sameAs": [u for _, u in SOCIALS],
+    "knowsAbout": ["Virtual Reality Training", "Augmented Reality", "Digital Twins",
+                   "3D Scanning", "Photogrammetry", "Utility Workforce Development",
+                   "Energy Education", "Extended Reality"],
+})
 
 # ---------------------------------------------------------------- helpers
 
@@ -428,35 +525,45 @@ def href(page, inline):
     return f"#/{page}" if inline else f"{page}.html"
 
 
-def phref(slug, inline):
-    return f"#/p/{slug}" if inline else f"project-{slug}.html"
-
-
 def nav(active, inline):
     links = "".join(
         f'<a class="lnk{" on" if key == active else ""}" href="{href(key, inline)}">{label}</a>'
         for key, label in NAV_ITEMS)
     mob = "".join(f'<a href="{href(key, inline)}">{label}</a>' for key, label in NAV_ITEMS)
     return (f'<nav class="nav"><div class="wrap nav-in">'
-            f'<a class="brand" href="{href("index", inline)}" aria-label="Froliq home">{LOGO_SVG}<b>FROLIQ</b></a>'
+            f'<a class="brand" href="{href("index", inline)}" aria-label="Froliq home">{LOGO_SVG}</a>'
             f'{links}<a class="btn btn-grad" href="{TYPEFORM}" rel="noopener">Request a demo</a></div>'
             f'<div class="nav-mob wrap">{mob}</div></nav>')
 
 
 def footer(inline):
     return (f'<footer><div class="wrap foot"><span>© 2026 Froliq · Austin, TX</span>'
-            f'<span><a href="{href("work", inline)}">Work</a><a href="{href("contact", inline)}">Contact</a></span>'
+            f'<span><a href="{href("work", inline)}">Work</a><a href="{href("news", inline)}">News</a>'
+            f'<a href="{href("contact", inline)}">Contact</a></span>'
             f'</div></footer>')
 
 
-def shell(title, body, active, inline):
+def shell(title, body, active, inline, desc=DEFAULT_DESC, path="", og_image=OG_IMAGE, extra_ld=None):
+    canonical = f"{SITE_URL}/{path}" if path else SITE_URL + "/"
+    ld = f'<script type="application/ld+json">{ORG_LD}</script>'
+    if extra_ld:
+        ld += f'<script type="application/ld+json">{extra_ld}</script>'
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{title}</title>
-<meta name="description" content="Froliq builds digital twins, VR training, and educational XR games for energy, utilities, and education. Austin, TX.">
+<meta name="description" content="{desc}">
+<link rel="canonical" href="{canonical}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Froliq">
+<meta property="og:title" content="{title}">
+<meta property="og:description" content="{desc}">
+<meta property="og:url" content="{canonical}">
+<meta property="og:image" content="{og_image}">
+<meta name="twitter:card" content="summary_large_image">
+{ld}
 {FONTS}
 <style>{CSS}</style>
 </head>
@@ -475,7 +582,7 @@ def work_card(p, inline, hero=False):
         pills += '<span class="pill pill-grad">▶ Video</span>'
     cls = "work work-hero" if hero else "work"
     f, fn = p["img"]
-    return (f'<a class="{cls}" href="{phref(p["slug"], inline)}">'
+    return (f'<a class="{cls}" href="{href("project-" + p["slug"], inline)}">'
             f'<img src="{img_src(f, fn, inline)}" alt="{p["client"]} — {p["title"]}" loading="lazy">'
             f'<div class="body"><span class="client">{p["client"]}</span><h3>{p["title"]}</h3>'
             f'<p>{p["card"]}</p><div class="pills">{pills}</div></div></a>')
@@ -485,10 +592,24 @@ def app_card(p, inline):
     f, fn = p["img"]
     cls = "xr ar" if p["xr"] == "AR" else "xr"
     play = '<span class="play">▶</span>' if p.get("video") else ''
-    return (f'<a class="app" href="{phref(p["slug"], inline)}">'
+    return (f'<a class="app" href="{href("project-" + p["slug"], inline)}">'
             f'<span class="shot"><img src="{img_src(f, fn, inline)}" alt="{p["title"]} — screenshot" loading="lazy">'
             f'{play}</span>'
             f'<div class="meta"><b>{p["title"]}</b><span class="{cls}">{p["xr"]}</span></div></a>')
+
+
+def team_card(m, inline):
+    return (f'<a class="tcard" href="{href("team-" + m["slug"], inline)}">'
+            f'<span class="av">{m["init"]}</span><span><b>{m["name"]}</b>'
+            f'<span class="role">{m["role"]}</span></span>'
+            f'<p>{m["paras"][0]}</p><span class="go">Meet {m["name"].split()[0]} →</span></a>')
+
+
+def news_card(a, inline):
+    d = a["date"] or ""
+    return (f'<a class="ncard" href="{href("news-" + a["slug"], inline)}">'
+            f'<img src="{img_src("news", a["img"], inline)}" alt="{a["title"]}" loading="lazy">'
+            f'<div class="body"><time datetime="{d}">{d}</time><b>{a["title"]}</b></div></a>')
 
 
 def logo_strip(inline, label="Trusted by"):
@@ -513,14 +634,24 @@ def page_index(inline):
     svc = "".join(
         f'<div class="svc"><span class="num">S{i}</span><h3>{t}</h3><p>{d}</p><span class="tag">{tag}</span></div>'
         for i, (t, d, tag) in enumerate(SERVICES[:3], 1))
+    news = "".join(news_card(a, inline) for a in NEWS[:3])
     body = f"""
 <header class="hero"><div class="wrap">
-  <p class="eyebrow">XR Studio · Austin, TX</p>
-  <h1>Step inside the <span class="grad-text">future of energy</span>.</h1>
-  <p class="lede">Froliq builds digital twins, immersive training, and educational XR games for utilities, museums, and communities — turning the most complex systems into experiences anyone can walk through.</p>
-  <div class="hero-cta">
-    <a class="btn btn-grad" href="{TYPEFORM}" rel="noopener">Request a demo</a>
-    <a class="btn btn-ghost" href="{href('work', inline)}">See the work</a>
+  <div class="hero-grid">
+    <div>
+      <p class="eyebrow">XR Studio · Austin, TX</p>
+      <h1>Step inside the <span class="grad-text">future of energy</span>.</h1>
+      <p class="lede">Froliq builds digital twins, immersive training, and educational XR games for utilities, museums, and communities — turning the most complex systems into experiences anyone can walk through.</p>
+      <div class="hero-cta">
+        <a class="btn btn-grad" href="{TYPEFORM}" rel="noopener">Request a demo</a>
+        <a class="btn btn-ghost" href="{href('work', inline)}">See the work</a>
+      </div>
+    </div>
+    <div class="collage" aria-hidden="true">
+      <img class="c1" src="{img_src('featured', 'smithsonian.jpg', inline)}" alt="">
+      <img class="c2" src="{img_src('featured', 'vistra.jpg', inline)}" alt="">
+      <img class="c3" src="{img_src('featured', 'oracle.jpg', inline)}" alt="">
+    </div>
   </div>
   <div class="stats">
     <div class="stat"><b>10,000</b><span>guests through our Smithsonian VR experience</span></div>
@@ -540,8 +671,14 @@ def page_index(inline):
   <div class="svc-grid">{svc}</div>
   <p class="sec-foot"><a class="arrow-lnk" href="{href('services', inline)}">All five services →</a></p>
 </div></section>
+<section><div class="wrap">
+  <div class="sec-head"><p class="eyebrow">News</p><h2>Fresh from the field.</h2></div>
+  <div class="news-grid">{news}</div>
+  <p class="sec-foot"><a class="arrow-lnk" href="{href('news', inline)}">All news →</a></p>
+</div></section>
 <section><div class="wrap">{cta_block(inline)}</div></section>"""
-    return shell("Froliq — XR Studio", body, None, inline)
+    return shell("Froliq | VR & AR Training for Energy and Utilities", body, None, inline,
+                 desc=DEFAULT_DESC, path="")
 
 
 def page_work(inline):
@@ -556,7 +693,9 @@ def page_work(inline):
 <section style="padding-top:34px"><div class="wrap"><div class="work-grid">{cards}</div>
 <p class="sec-foot">Looking for the games and training sims? <a class="arrow-lnk" href="{href('apps', inline)}">Browse the app library →</a></p>
 </div></section>"""
-    return shell("Work — Froliq", body, "work", inline)
+    return shell("XR Projects for Utilities & Museums | Froliq", body, "work", inline,
+                 desc="Digital twins, VR facility tours, and AR experiences built with the Smithsonian, Oracle, Exelon, SMUD, Vistra, and more.",
+                 path="work.html")
 
 
 def page_apps(inline):
@@ -569,7 +708,9 @@ def page_apps(inline):
   <p class="sub">A dozen shipped experiences across VR and AR — training sims, challenges, films, and games. Every app has its own page with a video.</p>
 </div></header>
 <section style="padding-top:34px"><div class="wrap"><div class="lib-grid">{cards}</div></div></section>"""
-    return shell("Apps — Froliq", body, "apps", inline)
+    return shell("VR & AR App Library | Froliq", body, "apps", inline,
+                 desc="Froliq's shipped VR and AR apps: utility training simulators, energy education games, AR soccer, VR films, and more — each with video.",
+                 path="apps.html")
 
 
 def page_services(inline):
@@ -590,13 +731,101 @@ def page_services(inline):
   <div class="steps">{steps}</div>
 </div></section>
 <section><div class="wrap">{cta_block(inline)}</div></section>"""
-    return shell("Services — Froliq", body, "services", inline)
+    return shell("Digital Twins, VR Training & 3D Scanning Services | Froliq", body, "services", inline,
+                 desc="Froliq's services: digital twins and VR facility tours, 3D scanning and reality capture, educational XR games, AR live-data experiences, and event outreach.",
+                 path="services.html")
+
+
+def page_team(inline):
+    cards = "".join(team_card(m, inline) for m in TEAM)
+    body = f"""
+<header class="page-head"><div class="wrap">
+  <p class="eyebrow">The team</p>
+  <h1>The people behind the headsets.</h1>
+  <p class="sub">Artists, developers, and energy nerds in Austin, TX — every one of them has run a demo with a line around the booth.</p>
+</div></header>
+<section style="padding-top:34px"><div class="wrap"><div class="team-grid">{cards}</div></div></section>
+<section><div class="wrap">{cta_block(inline)}</div></section>"""
+    return shell("Meet the Team | Froliq", body, "team", inline,
+                 desc="The Froliq team: XR developers, 3D artists, creative leads, and client partners building VR and AR for energy and education in Austin, TX.",
+                 path="team.html")
+
+
+def page_member(m, inline):
+    pills = "".join(f'<span class="pill">{x}</span>' for x in m["pills"])
+    prose = "".join(f"<p>{para}</p>" for para in m["paras"])
+    links = "".join(f'<a href="{u}" rel="noopener" target="_blank">{n} ↗</a>' for n, u in m["links"])
+    link_row = f'<div class="link-row">{links}</div>' if links else ''
+    person_ld = json.dumps({
+        "@context": "https://schema.org", "@type": "Person",
+        "name": m["name"], "jobTitle": m["role"],
+        "worksFor": {"@type": "Organization", "name": "Froliq", "url": SITE_URL},
+        "url": f"{SITE_URL}/team-{m['slug']}.html",
+        "sameAs": [u for _, u in m["links"]],
+    })
+    body = f"""
+<div class="detail">
+  <div class="detail-head">
+    <div class="member-head"><span class="av">{m["init"]}</span>
+      <div><p class="eyebrow" style="margin-bottom:6px">{m["role"]}</p><h1 style="margin:0">{m["name"]}</h1></div>
+    </div>
+    <div class="pills" style="margin-top:14px">{pills}</div>
+  </div>
+  <div class="prose">{prose}</div>
+  {link_row}
+  <div class="detail-cta"><b>Work with {m["name"].split()[0]} and the team</b><a class="btn btn-grad" href="{TYPEFORM}" rel="noopener">Request a demo</a></div>
+  <div class="back-row"><a class="arrow-lnk" href="{href('team', inline)}">← The whole team</a><a class="arrow-lnk" href="{href('work', inline)}">See the work →</a></div>
+</div>"""
+    return shell(f'{m["name"]} — {m["role"]} | Froliq', body, "team", inline,
+                 desc=m["paras"][0][:155], path=f"team-{m['slug']}.html", extra_ld=person_ld)
+
+
+def page_news(inline):
+    cards = "".join(news_card(a, inline) for a in NEWS)
+    body = f"""
+<header class="page-head"><div class="wrap">
+  <p class="eyebrow">News &amp; events</p>
+  <h1>Fresh from the field.</h1>
+  <p class="sub">Launches, partnerships, and the events where Froliq showed up with headsets.</p>
+</div></header>
+<section style="padding-top:34px"><div class="wrap"><div class="news-grid">{cards}</div></div></section>"""
+    return shell("News & Events | Froliq", body, "news", inline,
+                 desc="Froliq news: Oracle AR launches, the Smithsonian FUTURES exhibit, SXSW, and more from the Austin XR studio for energy and education.",
+                 path="news.html")
+
+
+def page_article(a, inline):
+    prose = "".join(f"<p>{para}</p>" for para in a["paras"])
+    d = a["date"] or ""
+    art_ld = json.dumps({
+        "@context": "https://schema.org", "@type": "NewsArticle",
+        "headline": a["title"], "datePublished": d,
+        "image": f"{SITE_URL}/assets/news/{a['img']}",
+        "publisher": {"@type": "Organization", "name": "Froliq", "url": SITE_URL},
+        "mainEntityOfPage": f"{SITE_URL}/news-{a['slug']}.html",
+    })
+    body = f"""
+<div class="detail">
+  <div class="detail-head">
+    <p class="eyebrow">News · <time datetime="{d}">{d}</time></p>
+    <h1>{a["title"]}</h1>
+  </div>
+  <div class="detail-hero"><img src="{img_src('news', a['img'], inline)}" alt="{a['title']}"></div>
+  <div class="prose">{prose}</div>
+  <p class="src-note">Originally published at <a href="{a["source"]}" rel="noopener">{a["source"].split("//")[1].split("/")[0]}</a>.</p>
+  <div class="detail-cta"><b>Want Froliq at your next event?</b><a class="btn btn-grad" href="{TYPEFORM}" rel="noopener">Request a demo</a></div>
+  <div class="back-row"><a class="arrow-lnk" href="{href('news', inline)}">← All news</a><a class="arrow-lnk" href="{href('contact', inline)}">Get in touch →</a></div>
+</div>"""
+    return shell(f'{a["title"]} | Froliq News', body, "news", inline,
+                 desc=(a["desc"] or a["paras"][0])[:155], path=f"news-{a['slug']}.html",
+                 og_image=f"{SITE_URL}/assets/news/{a['img']}", extra_ld=art_ld)
 
 
 def page_about(inline):
-    team = "".join(
-        f'<div class="member"><span class="av">{init}</span><span><b>{name}</b><span>{role}</span></span></div>'
-        for name, role, init in TEAM)
+    minis = "".join(
+        f'<a class="member" href="{href("team-" + m["slug"], inline)}"><span class="av">{m["init"]}</span>'
+        f'<span><b>{m["name"]}</b><span>{m["role"]}</span></span></a>'
+        for m in TEAM[:4])
     body = f"""
 <header class="page-head"><div class="wrap">
   <p class="eyebrow">About Froliq</p>
@@ -604,14 +833,18 @@ def page_about(inline):
 </div></header>
 <section style="padding-top:24px"><div class="wrap about-grid">
   <div>
-    <p>Froliq was founded in Austin, Texas in 2022 to build next-generation education, engagement, and training experiences. A lot of our work is digital twins and training tools for energy, utilities, and infrastructure — and just as much is educational XR for nonprofits and communities who want complex topics made simple and fun.</p>
+    <p>Froliq was born out of Zpryme, the Austin-based energy research, media, and events company, and launched as its standalone XR brand to build next-generation education, engagement, and training experiences.</p>
+    <p>A lot of our work is digital twins and training tools for energy, utilities, and infrastructure — and just as much is educational XR for nonprofits and communities who want complex topics made simple and fun.</p>
     <p>We show up in person, too: outreach events, conferences, schools. At the core it's always the same — learning, safety, and helping the next generation feel confident stepping into complex fields.</p>
   </div>
-  <div><h3 style="margin-bottom:14px">The team</h3><div class="team">{team}</div></div>
+  <div><h3 style="margin-bottom:14px">The team</h3><div class="team-mini">{minis}</div>
+  <p class="sec-foot"><a class="arrow-lnk" href="{href('team', inline)}">Meet everyone →</a></p></div>
 </div></section>
 {logo_strip(inline, label="Partners & clients")}
 <section><div class="wrap">{cta_block(inline)}</div></section>"""
-    return shell("About — Froliq", body, "about", inline)
+    return shell("About Froliq | Austin XR Studio", body, "about", inline,
+                 desc="Froliq is Zpryme's XR studio in Austin, TX — building VR and AR for clean-energy workforce development, education, and community outreach.",
+                 path="about.html")
 
 
 def page_contact(inline):
@@ -622,7 +855,9 @@ def page_contact(inline):
   <p class="sub">A facility to scan, a program to gamify, an event that needs a line around the booth — tell us what you're planning.</p>
 </div></header>
 <section style="padding-top:34px"><div class="wrap">{cta_block(inline)}</div></section>"""
-    return shell("Contact — Froliq", body, "contact", inline)
+    return shell("Contact Froliq | Request a Demo", body, "contact", inline,
+                 desc="Talk to Froliq about VR training, digital twins, 3D scanning, or XR for your next event. Austin, TX.",
+                 path="contact.html")
 
 
 def page_project(p, inline):
@@ -653,41 +888,46 @@ def page_project(p, inline):
   <div class="detail-cta"><b>Want something like this?</b><a class="btn btn-grad" href="{TYPEFORM}" rel="noopener">Request a demo</a></div>
   <div class="back-row"><a class="arrow-lnk" href="{back}">{back_label}</a><a class="arrow-lnk" href="{href('contact', inline)}">Get in touch →</a></div>
 </div>"""
-    return shell(f'{p["title"]} — Froliq', body, "work" if p.get("featured") else "apps", inline)
+    return shell(f'{p["title"]} — {p["client"]} | Froliq', body,
+                 "work" if p.get("featured") else "apps", inline,
+                 desc=p["card"][:155], path=f"project-{p['slug']}.html",
+                 og_image=f"{SITE_URL}/assets/{f}/{fn}")
 
 # ---------------------------------------------------------------- build
 
-PAGES = {
-    "index": page_index, "work": page_work, "apps": page_apps,
-    "services": page_services, "about": page_about, "contact": page_contact,
-}
+def all_pages():
+    """{page_key: html_fn(inline)} for every page on the site."""
+    pages = {
+        "index": page_index, "work": page_work, "apps": page_apps,
+        "services": page_services, "team": page_team, "news": page_news,
+        "about": page_about, "contact": page_contact,
+    }
+    for p in PROJECTS:
+        pages[f"project-{p['slug']}"] = (lambda inline, p=p: page_project(p, inline))
+    for m in TEAM:
+        pages[f"team-{m['slug']}"] = (lambda inline, m=m: page_member(m, inline))
+    for a in NEWS:
+        pages[f"news-{a['slug']}"] = (lambda inline, a=a: page_article(a, inline))
+    return pages
 
 
 def extract_body(html):
-    """Body content between nav and footer for the single-file preview router."""
     start = html.index('</nav>') + len('</nav>')
     end = html.index('<footer>')
     return html[start:end]
 
 
-def build_preview():
-    """Single file: every page as a hidden route, hash routing (#/page, #/p/slug)."""
+def build_preview(pages):
     sections = []
-    for key, fn in PAGES.items():
-        body = extract_body(fn(inline=True))
+    for key, fn in pages.items():
+        body = extract_body(fn(True))
         sections.append(f'<div class="route" id="route-{key}" hidden>{body}</div>')
-    for p in PROJECTS:
-        body = extract_body(page_project(p, inline=True))
-        sections.append(f'<div class="route" id="route-p-{p["slug"]}" hidden>{body}</div>')
-
     router = """
 <script>
 (function(){
   function route(){
     var h = location.hash.replace(/^#\\/?/, '');
-    var id = 'route-index';
-    if (h) id = h.indexOf('p/') === 0 ? 'route-p-' + h.slice(2) : 'route-' + h;
-    var target = document.getElementById(id) || document.getElementById('route-index');
+    var target = document.getElementById('route-' + (h || 'index')) || document.getElementById('route-index');
     document.querySelectorAll('.route').forEach(function(el){ el.hidden = true; });
     target.hidden = false;
     document.querySelectorAll('.nav a.lnk').forEach(function(a){
@@ -699,28 +939,41 @@ def build_preview():
   route();
 })();
 </script>"""
-    html = shell("Froliq — XR Studio", "\n".join(sections) + router, None, inline=True)
+    html = shell("Froliq | VR & AR Training for Energy and Utilities",
+                 "\n".join(sections) + router, None, inline=True)
     open(os.path.join(ROOT, 'preview.html'), 'w').write(html)
+
+
+def build_seo_files(pages):
+    urls = []
+    for key in pages:
+        loc = SITE_URL + "/" if key == "index" else f"{SITE_URL}/{key}.html"
+        urls.append(f"  <url><loc>{loc}</loc></url>")
+    sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+               '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+               + "\n".join(urls) + "\n</urlset>\n")
+    open(os.path.join(OUT, 'sitemap.xml'), 'w').write(sitemap)
+    open(os.path.join(OUT, 'robots.txt'), 'w').write(
+        f"User-agent: *\nAllow: /\n\nSitemap: {SITE_URL}/sitemap.xml\n")
 
 
 def main():
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     os.makedirs(os.path.join(OUT, 'assets'))
-    for sub in ('work', 'featured', 'logos'):
+    for sub in ('work', 'featured', 'logos', 'news'):
         shutil.copytree(os.path.join(ASSETS, sub), os.path.join(OUT, 'assets', sub))
+    os.remove(os.path.join(OUT, 'assets', 'news', 'news.json'))
     shutil.copy(os.path.join(ASSETS, 'froliq-logo.svg'), os.path.join(OUT, 'assets'))
 
-    for key, fn in PAGES.items():
-        open(os.path.join(OUT, f'{key}.html'), 'w').write(fn(inline=False))
-    for p in PROJECTS:
-        open(os.path.join(OUT, f'project-{p["slug"]}.html'), 'w').write(page_project(p, inline=False))
-    open(os.path.join(OUT, '404.html'), 'w').write(page_index(inline=False).replace(
+    pages = all_pages()
+    for key, fn in pages.items():
+        open(os.path.join(OUT, f'{key}.html'), 'w').write(fn(False))
+    open(os.path.join(OUT, '404.html'), 'w').write(page_index(False).replace(
         '<h1>Step inside', '<h1>404 — page not found. Step inside', 1))
-
-    build_preview()
-    n = len(PAGES) + len(PROJECTS)
-    print(f"built {n} pages -> docs/, plus preview.html")
+    build_seo_files(pages)
+    build_preview(pages)
+    print(f"built {len(pages)} pages -> docs/ (+404, sitemap, robots), plus preview.html")
 
 
 if __name__ == '__main__':
