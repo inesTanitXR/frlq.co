@@ -36,6 +36,7 @@ CSS = r"""
   --shadow:0 14px 40px rgba(45,20,90,.10);
   --nav-bg:rgba(247,245,252,.82);
   --chip-bg:transparent;
+  --cta-bg:#191036; --cta-ink:#ffffff; --cta-sub:#cfc5ea; --cta-line:transparent;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -47,6 +48,7 @@ CSS = r"""
     --shadow:0 14px 40px rgba(0,0,0,.45);
     --nav-bg:rgba(15,10,30,.82);
     --chip-bg:#f3eeff;
+    --cta-bg:#191131; --cta-ink:#f3eeff; --cta-sub:#c9c0e2; --cta-line:#2c2350;
   }
 }
 :root[data-theme="dark"]{
@@ -58,6 +60,7 @@ CSS = r"""
   --shadow:0 14px 40px rgba(0,0,0,.45);
   --nav-bg:rgba(15,10,30,.82);
   --chip-bg:#f3eeff;
+  --cta-bg:#191131; --cta-ink:#f3eeff; --cta-sub:#c9c0e2; --cta-line:#2c2350;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -118,14 +121,12 @@ section{padding:64px 0}
 .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center}
 .hero .lede{font-size:19.5px;max-width:620px;color:var(--body)}
 .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin:30px 0 0}
-.collage{position:relative;min-height:420px}
-.collage img{position:absolute;border-radius:18px;border:5px solid var(--card);box-shadow:0 18px 50px rgba(25,16,54,.22);object-fit:cover}
-.collage .c1{width:66%;aspect-ratio:4/3.4;right:4%;top:0;transform:rotate(2.2deg)}
-.collage .c2{width:52%;aspect-ratio:16/10;left:0;top:44%;transform:rotate(-2.5deg);z-index:2}
-.collage .c3{width:44%;aspect-ratio:1/1;right:0;top:56%;transform:rotate(1.5deg)}
+.hero-video{position:relative;border-radius:22px;overflow:hidden;border:5px solid var(--card);box-shadow:0 18px 50px rgba(25,16,54,.22);transform:rotate(1.2deg);aspect-ratio:16/9;background:#0f0a1e}
+.hero-video video{width:100%;height:100%;object-fit:cover;display:block}
+.hero-video .reel-tag{position:absolute;left:14px;bottom:12px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:rgba(15,10,30,.62);padding:5px 11px;border-radius:999px;backdrop-filter:blur(6px)}
 @media(max-width:900px){
   .hero-grid{grid-template-columns:1fr}
-  .collage{min-height:0;height:340px;margin-top:8px}
+  .hero-video{margin-top:8px;transform:none}
 }
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:56px;position:relative;z-index:1}
 .stat{border-top:2.5px solid transparent;border-image:var(--grad) 1;padding-top:16px}
@@ -138,7 +139,8 @@ section{padding:64px 0}
 .clients .label{text-align:center;font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:20px}
 .logo-row{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 26px;align-items:center}
 .logo-chip{background:var(--chip-bg);border-radius:14px;padding:10px 16px;display:flex;align-items:center;justify-content:center}
-.logo-chip img{height:38px;width:auto;max-width:170px;object-fit:contain}
+.logo-chip img{height:38px;width:auto;max-width:170px;object-fit:contain;filter:grayscale(1);opacity:.72;transition:filter .2s ease,opacity .2s ease}
+.logo-chip:hover img{filter:none;opacity:1}
 
 /* services */
 .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
@@ -264,19 +266,17 @@ a.ncard:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
 .src-note{font-size:13.5px;color:var(--muted)}
 
 /* contact */
-.cta{background:var(--ink);border-radius:28px;padding:64px 40px;text-align:center;position:relative;overflow:hidden}
+.cta{background:var(--cta-bg);border:1px solid var(--cta-line);border-radius:28px;padding:64px 40px;text-align:center;position:relative;overflow:hidden}
 .cta::before{content:"";position:absolute;inset:0;
   background-image:radial-gradient(rgba(255,255,255,.14) 1.2px, transparent 1.2px);background-size:24px 24px;
   -webkit-mask-image:radial-gradient(500px 320px at 50% 0%,#000,transparent 75%);
   mask-image:radial-gradient(500px 320px at 50% 0%,#000,transparent 75%)}
-:root[data-theme="dark"] .cta{background:var(--card)}
-.cta h2{color:#fff;position:relative}
-:root[data-theme="dark"] .cta h2{color:var(--ink)}
-.cta p{color:#cfc5ea;max-width:520px;margin:0 auto 26px;position:relative}
+.cta h2{color:var(--cta-ink);position:relative}
+.cta p{color:var(--cta-sub);max-width:520px;margin:0 auto 26px;position:relative}
 .cta .btn{position:relative}
 .socials{display:flex;justify-content:center;gap:20px;margin-top:26px;position:relative;flex-wrap:wrap}
-.socials a{color:#cfc5ea;font-size:14px;text-decoration:none;font-family:"IBM Plex Mono",monospace}
-.socials a:hover{color:#fff}
+.socials a{color:var(--cta-sub);font-size:14px;text-decoration:none;font-family:"IBM Plex Mono",monospace}
+.socials a:hover{color:var(--cta-ink)}
 
 footer{padding:34px 0 48px;font-size:14px;color:var(--muted);border-top:1px solid var(--line);margin-top:64px}
 .foot{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
@@ -385,7 +385,7 @@ PROJECTS = [
     dict(slug="smithsonian-futures", featured=True, hero_card=True,
          client="Smithsonian × Oracle", title="FUTURES Exhibit VR", xr="VR",
          img=("featured", "smithsonian.jpg"), video=None,
-         card="A fully immersive journey through the lifecycle of energy and water — guests interact with everything hands-on and leave understanding their role in a clean energy future.",
+         card="Guests walk the lifecycle of energy and water hands-on — and leave knowing the role they play in a clean energy future.",
          pills=["10,000 guests", "600K exhibition visitors"],
          paras=[
              "For the Smithsonian's FUTURES exhibition, we built a fully immersive virtual reality experience with Oracle exploring the lifecycle of energy and water — how we make it, how we use it, and how to conserve it.",
@@ -485,8 +485,8 @@ PROJECTS = [
          paras=["A fast-paced VR challenge about lighting and energy efficiency — small choices, visible impact."]),
     dict(slug="history-of-energy", client="Froliq Originals", title="History of Energy", xr="VR",
          img=("work", "history-of-energy.jpg"), video="Xa_Zfa1RtRs",
-         card="A VR journey through energy's story.", pills=[],
-         paras=["A VR journey through how humans have made and used energy — from the first fires to the modern grid."]),
+         card="The story of energy, from first fires to the modern grid.", pills=[],
+         paras=["How humans have made and used energy, told in VR — from the first fires to the modern grid."]),
     dict(slug="solar-tracker", client="Froliq Originals", title="Solar Tracker", xr="VR",
          img=("work", "solar-tracker.jpg"), video="Buht7EHT2Wk",
          card="Follow the sun in VR.", pills=[],
@@ -677,10 +677,11 @@ def page_index(inline):
         <a class="btn btn-ghost" href="{href('work', inline)}">See the work</a>
       </div>
     </div>
-    <div class="collage" aria-hidden="true">
-      <img class="c1" src="{img_src('featured', 'smithsonian.jpg', inline)}" alt="">
-      <img class="c2" src="{img_src('featured', 'vistra.jpg', inline)}" alt="">
-      <img class="c3" src="{img_src('featured', 'oracle.jpg', inline)}" alt="">
+    <div class="hero-video">
+      <video autoplay muted loop playsinline poster="{img_src('video', 'reel-poster.jpg', inline)}" aria-label="Reel of Froliq XR experiences in action">
+        <source src="{img_src('video', 'froliq-reel.mp4', inline)}" type="video/mp4">
+      </video>
+      <span class="reel-tag">Froliq in the field</span>
     </div>
   </div>
   <div class="stats">
@@ -692,7 +693,7 @@ def page_index(inline):
 </div></header>
 {logo_strip(inline)}
 <section><div class="wrap">
-  <div class="sec-head"><p class="eyebrow">Featured work</p><h2>Built with world-class partners.</h2></div>
+  <div class="sec-head"><p class="eyebrow">Featured work</p><h2>From the Smithsonian to the switchyard.</h2></div>
   <div class="work-grid">{teaser}</div>
   <p class="sec-foot"><a class="arrow-lnk" href="{href('work', inline)}">See all work →</a></p>
 </div></section>
@@ -706,7 +707,8 @@ def page_index(inline):
   <div class="news-grid">{news}</div>
   <p class="sec-foot"><a class="arrow-lnk" href="{href('news', inline)}">All news →</a></p>
 </div></section>
-<section><div class="wrap">{cta_block(inline)}</div></section>"""
+<section><div class="wrap">{cta_block(inline)}</div></section>
+<script>if(matchMedia('(prefers-reduced-motion: reduce)').matches){{document.querySelectorAll('.hero-video video').forEach(function(v){{v.removeAttribute('autoplay');v.pause()}})}}</script>"""
     return shell("Froliq | VR & AR Training for Energy and Utilities", body, None, inline,
                  desc=DEFAULT_DESC, path="")
 
@@ -717,7 +719,7 @@ def page_work(inline):
     body = f"""
 <header class="page-head"><div class="wrap">
   <p class="eyebrow">Featured work</p>
-  <h1>Built with world-class partners.</h1>
+  <h1>From the Smithsonian to the switchyard.</h1>
   <p class="sub">From the Smithsonian to the plant floor — every project has its own page. Click through for the full story.</p>
 </div></header>
 <section style="padding-top:34px"><div class="wrap"><div class="work-grid">{cards}</div>
@@ -863,7 +865,7 @@ def page_about(inline):
 </div></header>
 <section style="padding-top:24px"><div class="wrap about-grid">
   <div>
-    <p>Froliq was born out of Zpryme, the Austin-based energy research, media, and events company, and launched as its standalone XR brand to build next-generation education, engagement, and training experiences.</p>
+    <p>Froliq was born out of Zpryme, the Austin-based energy research, media, and events company, and launched as its standalone XR brand to build education, engagement, and training experiences in VR and AR.</p>
     <p>A lot of our work is digital twins and training tools for energy, utilities, and infrastructure — and just as much is educational XR for nonprofits and communities who want complex topics made simple and fun.</p>
     <p>We show up in person, too: outreach events, conferences, schools. At the core it's always the same — learning, safety, and helping the next generation feel confident stepping into complex fields.</p>
   </div>
@@ -1005,7 +1007,7 @@ def main():
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     os.makedirs(os.path.join(OUT, 'assets'))
-    for sub in ('work', 'featured', 'logos', 'news', 'team'):
+    for sub in ('work', 'featured', 'logos', 'news', 'team', 'video'):
         shutil.copytree(os.path.join(ASSETS, sub), os.path.join(OUT, 'assets', sub))
     os.remove(os.path.join(OUT, 'assets', 'news', 'news.json'))
     shutil.copy(os.path.join(ASSETS, 'froliq-logo.svg'), os.path.join(OUT, 'assets'))
