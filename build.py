@@ -448,6 +448,44 @@ PROJECTS = [
              "The scans process into an explorable 3D model — basically a 3D photo of the facility that you can step inside.",
              "From there, it can be built out on web, VR, or AR — whatever fits — for training and visual simulation."]),
     # ------- app library -------
+    dict(slug="recyclotopia", client="National Energy Foundation", title="Recyclotopia", xr="VR",
+         img=("work", "recyclotopia.jpg"), video="fhi4HOKOqMg",
+         card="Sort the conveyor before the landfill wins.",
+         pills=["Part of the Energy Mini-Game Series"],
+         paras=[
+             "A stationary VR game set at a virtual landfill: a conveyor belt of mixed waste rolls past, and players grab items and sort them into the right recycling bins before they slide by.",
+             "Every one-minute level gets faster and adds a new bin — paper, metal, compost, and more. Five mistakes and it's game over.",
+             "Students walk away knowing their recycling categories, what mis-sorting does to landfill capacity, and that their sorting choices actually matter."]),
+    dict(slug="bungaload", client="National Energy Foundation", title="BungaLoad", xr="VR",
+         img=("work", "bungaload.jpg"), video=None,
+         card="A home energy audit, gamified.",
+         pills=["Part of the Energy Mini-Game Series"],
+         paras=[
+             "BungaLoad drops players into a VR home — bedroom, living room, bathroom, kitchen — and hands them the job of an energy auditor.",
+             "Two minutes per room to spot the energy-wasters: lights left on, hungry appliances, leaky faucets. Drive the home's energy use below 30% to win.",
+             "Along the way, students learn the practical stuff — switch off lamps, adjust the thermostat, fix the leak — and watch each room's fixes add up on the whole-home meter."]),
+    dict(slug="fantasticwinds", client="National Energy Foundation", title="FantasticWinds", xr="VR",
+         img=("work", "fantasticwinds.jpg"), video=None,
+         card="Fan the turbines, power the town.",
+         pills=["Part of the Energy Mini-Game Series"],
+         paras=[
+             "FantasticWinds gives players a bird's-eye view of a wind farm — and a virtual fan. Fan each turbine from the front and it spins; spin enough of them and buildings light up below to show homes being powered.",
+             "Five levels, one minute each, with more turbines every round. Fan from the wrong side or miss one five times and it's game over.",
+             "The core lesson sticks because you feel it: turbines only make power when the wind hits the blades right — and X turbines spinning means Y homes powered."]),
+    dict(slug="current-cruisers", client="Froliq Originals", title="Current Cruisers", xr="VR",
+         img=("work", "current-cruisers.jpg"), video="BPOHyw9lNv4",
+         card="An EV race against the clock.",
+         pills=[],
+         paras=[
+             "Current Cruisers puts players behind the wheel of an electric vehicle for a race through hills and open road — steering wheel, dash, and all.",
+             "It's a crowd favorite at school and outreach events: quick laps, a visible timer, and an easy on-ramp to talking about the EV transition."]),
+    dict(slug="pole-climbing", client="Froliq Training", title="Pole Climbing Simulator", xr="VR",
+         img=("work", "pole-climbing.jpg"), video="-5-Gv570nFc",
+         card="Climb a utility pole — solo or head-to-head.",
+         pills=["Single or two player"],
+         paras=[
+             "Our lineworker pole-climbing simulator starts the way the real job does: check your equipment. Helmet, belt, gloves, hammer — pick the right gear before you ever leave the ground.",
+             "Then it's up the pole, with a task list to work through at height. Play it solo as training, or race a second player side by side — which makes it a magnet at career fairs and outreach events."]),
     dict(slug="sustainaball", client="Austin Energy · Austin FC", title="Sustainaball", xr="AR",
          img=("work", "sustainaball.jpg"), video="lU-qdaFcKII",
          card="Projection-based interactive soccer.",
@@ -737,7 +775,7 @@ def page_apps(inline):
 <header class="page-head"><div class="wrap">
   <p class="eyebrow">The app library</p>
   <h1>Every app, ready for the field.</h1>
-  <p class="sub">A dozen shipped experiences across VR and AR — training sims, challenges, films, and games. Every app has its own page with a video.</p>
+  <p class="sub">Seventeen shipped experiences across VR and AR — training sims, challenges, films, and games. Every app has its own page.</p>
 </div></header>
 <section style="padding-top:34px"><div class="wrap"><div class="lib-grid">{cards}</div></div></section>"""
     return shell("VR & AR App Library | Froliq", body, "apps", inline,
