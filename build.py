@@ -142,6 +142,13 @@ section{padding:64px 0}
 .logo-chip img{height:38px;width:auto;max-width:170px;object-fit:contain;filter:grayscale(1);opacity:.72;transition:filter .2s ease,opacity .2s ease}
 .logo-chip:hover img{filter:none;opacity:1}
 
+/* library filters */
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 28px}
+.fchip{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;padding:8px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--body);cursor:pointer;transition:border-color .15s ease}
+.fchip:hover{border-color:var(--purple)}
+.fchip.on{background:var(--grad);color:#fff;border-color:transparent}
+.lib-grid .app[hidden]{display:none}
+
 /* services */
 .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .svc{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px 24px;display:flex;flex-direction:column;gap:8px}
@@ -539,7 +546,22 @@ PROJECTS = [
          paras=["A short cinematic VR film from the Froliq team — storytelling you sit inside of."]),
 ]
 
-NAV_ITEMS = [("work", "Work"), ("apps", "Apps"), ("services", "Services"),
+# Library categories: every project gets one; used by the filter chips on the Work page.
+CATS = [("twins", "Digital twins & tours"), ("games", "Games"), ("training", "Training sims"),
+        ("education", "Education & outreach"), ("films", "Films & labs")]
+CAT_OF = {
+    "vistra-midlothian": "twins", "smud-hydropower": "twins", "davis-besse-scan": "twins",
+    "oracle-connected-hub": "twins",
+    "transmission-line-repair": "training", "bucket-truck": "training",
+    "lineman-challenge": "training", "pole-climbing": "training",
+    "smithsonian-futures": "education", "exelon-stem": "education",
+    "water-for-humanity": "education", "history-of-energy": "education", "solar-tracker": "education",
+    "not-it": "films", "virtual-avatar": "films",
+}
+for _p in PROJECTS:
+    _p["cat"] = CAT_OF.get(_p["slug"], "games")
+
+NAV_ITEMS = [("work", "Work"), ("services", "Services"),
              ("team", "Team"), ("news", "News"), ("about", "About"), ("contact", "Contact")]
 
 DEFAULT_DESC = ("Froliq is an Austin XR studio building digital twins, VR safety training, 3D scanning, "
@@ -643,7 +665,7 @@ def app_card(p, inline):
     f, fn = p["img"]
     cls = "xr ar" if p["xr"] == "AR" else "xr"
     play = '<span class="play">▶</span>' if p.get("video") else ''
-    return (f'<a class="app" href="{href("project-" + p["slug"], inline)}">'
+    return (f'<a class="app" data-cat="{p["cat"]}" href="{href("project-" + p["slug"], inline)}">'
             f'<span class="shot"><img src="{img_src(f, fn, inline)}" alt="{p["title"]} — screenshot" loading="lazy">'
             f'{play}</span>'
             f'<div class="meta"><b>{p["title"]}</b><span class="{cls}">{p["xr"]}</span></div></a>')
@@ -754,33 +776,32 @@ def page_index(inline):
 def page_work(inline):
     featured = [p for p in PROJECTS if p.get("featured")]
     cards = "".join(work_card(p, inline, hero=p.get("hero_card", False)) for p in featured)
+    lib_cards = "".join(app_card(p, inline) for p in PROJECTS)
+    chips = '<button class="fchip" data-cat="all" type="button">All</button>' + "".join(
+        f'<button class="fchip" data-cat="{key}" type="button">{label}</button>' for key, label in CATS)
     body = f"""
 <header class="page-head"><div class="wrap">
   <p class="eyebrow">Featured work</p>
   <h1>From the Smithsonian to the switchyard.</h1>
-  <p class="sub">From the Smithsonian to the plant floor — every project has its own page. Click through for the full story.</p>
+  <p class="sub">Every project — client programs, games, training sims — lives on this page, and each one has its own story. Start with the highlights, or filter the full library below.</p>
 </div></header>
-<section style="padding-top:34px"><div class="wrap"><div class="work-grid">{cards}</div>
-<p class="sec-foot">Looking for the games and training sims? <a class="arrow-lnk" href="{href('apps', inline)}">Browse the app library →</a></p>
-</div></section>"""
+<section style="padding-top:34px"><div class="wrap"><div class="work-grid">{cards}</div></div></section>
+<section style="padding-top:0" id="library"><div class="wrap">
+  <div class="sec-head"><p class="eyebrow">The full library</p><h2>Everything we've shipped.</h2>
+  <p>All {len(PROJECTS)} projects in one place — filter by type, click through for the full story.</p></div>
+  <div class="filters">{chips}</div>
+  <div class="lib-grid" id="lib">{lib_cards}</div>
+</div></section>
+<script>(function(){{var chips=document.querySelectorAll('.fchip'),cards=document.querySelectorAll('#lib .app');
+function sel(c){{chips.forEach(function(x){{x.classList.toggle('on',x.dataset.cat===c)}});
+cards.forEach(function(a){{a.hidden=(c!=='all'&&a.dataset.cat!==c)}})}}
+chips.forEach(function(x){{x.addEventListener('click',function(){{sel(x.dataset.cat)}})}});
+var h=(location.hash||'').replace('#','');
+sel(['twins','games','training','education','films'].indexOf(h)>=0?h:'all');
+}})()</script>"""
     return shell("XR Projects for Utilities & Museums | Froliq", body, "work", inline,
-                 desc="Digital twins, VR facility tours, and AR experiences built with the Smithsonian, Oracle, Exelon, SMUD, Vistra, and more.",
+                 desc="Digital twins, VR facility tours, training sims, and energy-education games built with the Smithsonian, Oracle, Exelon, SMUD, Vistra, and more.",
                  path="work.html")
-
-
-def page_apps(inline):
-    apps = [p for p in PROJECTS if not p.get("featured")]
-    cards = "".join(app_card(p, inline) for p in apps)
-    body = f"""
-<header class="page-head"><div class="wrap">
-  <p class="eyebrow">The app library</p>
-  <h1>Every app, ready for the field.</h1>
-  <p class="sub">Seventeen shipped experiences across VR and AR — training sims, challenges, films, and games. Every app has its own page.</p>
-</div></header>
-<section style="padding-top:34px"><div class="wrap"><div class="lib-grid">{cards}</div></div></section>"""
-    return shell("VR & AR App Library | Froliq", body, "apps", inline,
-                 desc="Froliq's shipped VR and AR apps: utility training simulators, energy education games, AR soccer, VR films, and more — each with video.",
-                 path="apps.html")
 
 
 def page_services(inline):
@@ -944,8 +965,10 @@ def page_project(p, inline):
                      f'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>')
     else:
         media = f'<div class="detail-hero"><img src="{img_src(f, fn, inline)}" alt="{p["title"]}"></div>'
-    back = href("work", inline) if p.get("featured") else href("apps", inline)
-    back_label = "← All work" if p.get("featured") else "← App library"
+    back = href("work", inline)
+    if not p.get("featured") and not inline:
+        back += "#library"
+    back_label = "← All work"
     body = f"""
 <div class="detail">
   <div class="detail-head">
@@ -959,7 +982,7 @@ def page_project(p, inline):
   <div class="back-row"><a class="arrow-lnk" href="{back}">{back_label}</a><a class="arrow-lnk" href="{href('contact', inline)}">Get in touch →</a></div>
 </div>"""
     return shell(f'{p["title"]} — {p["client"]} | Froliq', body,
-                 "work" if p.get("featured") else "apps", inline,
+                 "work", inline,
                  desc=p["card"][:155], path=f"project-{p['slug']}.html",
                  og_image=f"{SITE_URL}/assets/{f}/{fn}")
 
@@ -968,7 +991,7 @@ def page_project(p, inline):
 def all_pages():
     """{page_key: html_fn(inline)} for every page on the site."""
     pages = {
-        "index": page_index, "work": page_work, "apps": page_apps,
+        "index": page_index, "work": page_work,
         "services": page_services, "team": page_team, "news": page_news,
         "about": page_about, "contact": page_contact,
     }
@@ -1056,6 +1079,13 @@ def main():
         open(os.path.join(OUT, f'{key}.html'), 'w').write(fn(False))
     open(os.path.join(OUT, '404.html'), 'w').write(page_index(False).replace(
         '<h1>Step inside', '<h1>404 — page not found. Step inside', 1))
+    # apps.html merged into work.html — keep old links alive with a redirect
+    open(os.path.join(OUT, 'apps.html'), 'w').write(
+        '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
+        '<meta http-equiv="refresh" content="0;url=work.html#library">'
+        f'<link rel="canonical" href="{SITE_URL}/work.html">'
+        '<title>Froliq Work</title></head>'
+        '<body><p>The app library moved — <a href="work.html#library">see all work</a>.</p></body></html>')
     build_seo_files(pages)
     build_preview(pages)
     print(f"built {len(pages)} pages -> docs/ (+404, sitemap, robots), plus preview.html")
