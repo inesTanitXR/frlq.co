@@ -218,7 +218,7 @@ img.av-photo{object-fit:cover;border:3px solid var(--card);box-shadow:0 6px 18px
 .member-photo-init{width:100%;aspect-ratio:1/1;border-radius:24px;background:var(--grad);color:#fff;display:grid;place-items:center;
   font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:84px}
 @media(max-width:680px){.member-head{grid-template-columns:1fr}.member-photo,.member-photo-init{max-width:340px}}
-.link-row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 0}
+.link-row{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 0}
 .link-row a{font-family:"IBM Plex Mono",monospace;font-size:13px;text-decoration:none;color:var(--ink);
   border:1.5px solid var(--line);border-radius:999px;padding:7px 15px;background:var(--card)}
 .link-row a:hover{border-color:var(--purple);color:var(--purple)}
@@ -343,7 +343,7 @@ TEAM = [
              "Mark holds an MBA and a Master's in Management Information Systems from the University of South Florida, and a BS from the University of Florida's Warrington College of Business."]),
     dict(slug="ines-said", name="Ines Said", role="Lead XR Developer", init="IS",
          links=[("LinkedIn", "https://www.linkedin.com/in/inessaid/"),
-                ("Website", "https://www.inessaid.com"), ("Tanit XR", "https://tanitxr.org")],
+                ("inessaid.com", "https://www.inessaid.com"), ("Tanit XR", "https://tanitxr.org")],
          pills=["EE 30 Under 30", "Auggie Awards finalist", "IEEE Best Paper"],
          paras=[
              "Ines works across every part of the development process, combining art and technology to turn overwhelming topics into experiences you can step inside and interact with.",
@@ -859,11 +859,11 @@ def page_member(m, inline):
   <div class="detail-head">
     <div class="member-head">{big_photo(m, inline, "member-photo", "member-photo-init")}
       <div><p class="eyebrow" style="margin-bottom:6px">{m["role"]}</p><h1 style="margin:0">{m["name"]}</h1>
-      <div class="pills" style="margin-top:16px">{pills}</div></div>
+      <div class="pills" style="margin-top:16px">{pills}</div>
+      {link_row}</div>
     </div>
   </div>
   <div class="prose">{prose}</div>
-  {link_row}
   <div class="detail-cta"><b>Work with {m["name"].split()[0]} and the team</b><a class="btn btn-grad" href="{TYPEFORM}" rel="noopener">Request a demo</a></div>
   <div class="back-row"><a class="arrow-lnk" href="{href('team', inline)}">← The whole team</a><a class="arrow-lnk" href="{href('work', inline)}">See the work →</a></div>
 </div>"""
