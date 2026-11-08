@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://inestanitxr.github.io/frlq.co/sitemap.xml
+Sitemap: https://frlq.co/sitemap.xml

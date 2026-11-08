@@ -16,8 +16,9 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 ASSETS = os.path.join(ROOT, 'assets')
 OUT = os.path.join(ROOT, 'docs')
 
-# Switch to "https://frlq.co" at DNS cutover.
-SITE_URL = "https://inestanitxr.github.io/frlq.co"
+# Custom domain served by GitHub Pages (DNS at GoDaddy points here since 2026-11-08).
+CUSTOM_DOMAIN = "frlq.co"
+SITE_URL = f"https://{CUSTOM_DOMAIN}"
 
 LOGO_SVG = open(os.path.join(ASSETS, 'froliq-logo.svg')).read()
 LOGO_SVG = LOGO_SVG.replace('id="Layer_1-534353042"', 'class="logo-mark" aria-hidden="true"')
@@ -1073,6 +1074,7 @@ def main():
     os.remove(os.path.join(OUT, 'assets', 'news', 'news.json'))
     shutil.copy(os.path.join(ASSETS, 'froliq-logo.svg'), os.path.join(OUT, 'assets'))
     shutil.copy(os.path.join(ASSETS, 'og.png'), os.path.join(OUT, 'assets'))
+    open(os.path.join(OUT, 'CNAME'), 'w').write(CUSTOM_DOMAIN + '\n')
 
     pages = all_pages()
     for key, fn in pages.items():
