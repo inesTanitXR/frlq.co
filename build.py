@@ -305,13 +305,13 @@ SERVICES = [
      "Fully modeled, animated, and functional replicas of real facilities — walk the gas turbine room without a hard hat. Built for internal training, stakeholder engagement, and career-fair buzz.",
      "Vistra · Midlothian Power Plant"),
     ("3D Scanning & Reality Capture",
-     "Photogrammetry and next-generation scanning that turn a real facility into a 3D model you can step inside — then deploy to web, VR, or AR for training and visual simulation.",
+     "Photogrammetry, LiDAR, and Gaussian splatting that turn a real facility into a spatial 3D model you can step inside — then deploy it to web, VR, AR, or Apple Vision Pro for training and visual simulation.",
      "Davis-Besse Nuclear Power Plant"),
     ("Educational XR Games",
      "Mini-game worlds with shared hubs, live leaderboards, and player profiles. Students don't watch the lesson — they live it, then replay to level up.",
      "Recyclotopia · BungaLoad · FantasticWinds"),
-    ("AR & Live-Data Experiences",
-     "Augmented reality that overlays real-time data on the real world — from Oracle's Connected Hub to location-based storytelling and projection games that draw a crowd.",
+    ("Spatial & Live-Data Experiences",
+     "Augmented reality and spatial apps that place real-time data in the room around you — from Oracle's Connected Hub on Apple Vision Pro to location-based storytelling and projection games that draw a crowd.",
      "Oracle · StEVie · Sustainaball"),
     ("Events & Community Outreach",
      "We show up with headsets, staff, and experiences that create lines around the booth — career fests, school days, museums, and community events.",
@@ -565,7 +565,7 @@ for _p in PROJECTS:
 NAV_ITEMS = [("work", "Work"), ("services", "Services"),
              ("team", "Team"), ("news", "News"), ("about", "About"), ("contact", "Contact")]
 
-DEFAULT_DESC = ("Froliq is an Austin XR studio building digital twins, VR safety training, 3D scanning, "
+DEFAULT_DESC = ("Froliq is an Austin XR and spatial computing studio building digital twins, VR safety training, 3D scanning, "
                 "and educational AR/VR games for utilities, museums, and communities.")
 OG_IMAGE = f"{SITE_URL}/assets/og.png"
 
@@ -577,7 +577,7 @@ ORG_LD = json.dumps({
     "sameAs": [u for _, u in SOCIALS],
     "knowsAbout": ["Virtual Reality Training", "Augmented Reality", "Digital Twins",
                    "3D Scanning", "Photogrammetry", "Utility Workforce Development",
-                   "Energy Education", "Extended Reality"],
+                   "Energy Education", "Extended Reality", "Spatial Computing", "Gaussian Splatting"],
 })
 
 # ---------------------------------------------------------------- helpers
@@ -730,9 +730,9 @@ def page_index(inline):
 <header class="hero"><div class="wrap">
   <div class="hero-grid">
     <div>
-      <p class="eyebrow">XR Studio · Austin, TX</p>
+      <p class="eyebrow">XR &amp; Spatial Computing Studio · Austin, TX</p>
       <h1>Step inside the <span class="grad-text">future of energy</span>.</h1>
-      <p class="lede">Froliq builds digital twins, immersive training, and educational XR games for utilities, museums, and communities — turning the most complex systems into experiences anyone can walk through.</p>
+      <p class="lede">Froliq builds spatial computing experiences — digital twins, immersive training, and educational XR games — for utilities, museums, and communities, turning the most complex systems into places anyone can walk through.</p>
       <div class="hero-cta">
         <a class="btn btn-grad" href="{TYPEFORM}" rel="noopener">Request a demo</a>
         <a class="btn btn-ghost" href="{href('work', inline)}">See the work</a>
@@ -824,7 +824,7 @@ def page_services(inline):
 </div></section>
 <section><div class="wrap">{cta_block(inline)}</div></section>"""
     return shell("Digital Twins, VR Training & 3D Scanning Services | Froliq", body, "services", inline,
-                 desc="Froliq's services: digital twins and VR facility tours, 3D scanning and reality capture, educational XR games, AR live-data experiences, and event outreach.",
+                 desc="Froliq's services: digital twins and VR facility tours, 3D scanning and reality capture, educational XR games, spatial and AR live-data experiences, and event outreach.",
                  path="services.html")
 
 
@@ -926,6 +926,7 @@ def page_about(inline):
 <section style="padding-top:24px"><div class="wrap about-grid">
   <div>
     <p>Froliq was born out of Zpryme, the Austin-based energy research, media, and events company, and launched as its standalone XR brand to build education, engagement, and training experiences in VR and AR.</p>
+    <p>Today that work is spatial computing: we scan real places into 3D, then build the experiences that live inside them, on Meta Quest, Apple Vision Pro, phones, and the web.</p>
     <p>A lot of our work is digital twins and training tools for energy, utilities, and infrastructure — and just as much is educational XR for nonprofits and communities who want complex topics made simple and fun.</p>
     <p>We show up in person, too: outreach events, conferences, schools. At the core it's always the same — learning, safety, and helping the next generation feel confident stepping into complex fields.</p>
   </div>
@@ -935,7 +936,7 @@ def page_about(inline):
 {logo_strip(inline, label="Partners & clients")}
 <section><div class="wrap">{cta_block(inline)}</div></section>"""
     return shell("About Froliq | Austin XR Studio", body, "about", inline,
-                 desc="Froliq is Zpryme's XR studio in Austin, TX — building VR and AR for clean-energy workforce development, education, and community outreach.",
+                 desc="Froliq is Zpryme's XR and spatial computing studio in Austin, TX — building VR, AR, and Apple Vision Pro experiences for clean-energy workforce development, education, and community outreach.",
                  path="about.html")
 
 
