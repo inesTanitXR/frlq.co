@@ -23,7 +23,10 @@ SITE_URL = f"https://{CUSTOM_DOMAIN}"
 LOGO_SVG = open(os.path.join(ASSETS, 'froliq-logo.svg')).read()
 LOGO_SVG = LOGO_SVG.replace('id="Layer_1-534353042"', 'class="logo-mark" aria-hidden="true"')
 
-TYPEFORM = "https://zpryme.typeform.com/to/sZe6vb"
+# Every "Request a demo" / membership button opens the contact form, which FormSubmit
+# delivers to the shared inbox (needs a one-time activation click from that inbox).
+FORM_EMAIL = "immersivetech@frlq.co"
+FORM_ENDPOINT = "https://formsubmit.co/" + FORM_EMAIL
 
 FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">'
 
@@ -149,6 +152,17 @@ section{padding:64px 0}
 .fchip:hover{border-color:var(--purple)}
 .fchip.on{background:var(--grad);color:#fff;border-color:transparent}
 .lib-grid .app[hidden]{display:none}
+
+/* contact form */
+.cform{max-width:760px;display:flex;flex-direction:column;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px 26px}
+.cform .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cform label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14.5px;color:var(--ink)}
+.cform input,.cform select,.cform textarea{font:inherit;font-weight:400;font-size:15.5px;padding:11px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--ground);color:var(--ink);width:100%;box-sizing:border-box}
+.cform input:focus,.cform select:focus,.cform textarea:focus{outline:none;border-color:var(--purple)}
+.cform button{align-self:flex-start;border:0;cursor:pointer;font-family:inherit}
+.cform .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.form-note{font-size:13.5px;color:var(--muted);margin:0}
+@media(max-width:700px){.cform .row2{grid-template-columns:1fr}}
 
 /* membership */
 .tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start}
@@ -401,8 +415,6 @@ LOGOS = ["smithsonian.png", "oracle.png", "exelon.png", "smud.png", "vistra.png"
 # Utility membership tiers, from Chris Holt's "Froliq Utility Membership Page" doc (Nov 2026).
 MEMBERSHIP_LOGOS = ["austin-energy.png", "cps.png", "bge.png", "comed.png", "vistra.png",
                     "pepco.png", "smud.png", "ameren.png"]
-# Where the membership buttons go: Froliq's shared inbox (confirmed with Chris Holt, Nov 2026).
-MEMBERSHIP_CONTACT = "mailto:immersivetech@frlq.co?subject=Froliq%20utility%20membership"
 
 MEMBERSHIP = [
     dict(level="Level 1", name="Community Partner", price="$20,000", kind="Foundational membership",
@@ -661,6 +673,12 @@ def href(page, inline):
     return f"#/{page}" if inline else f"/{page}"
 
 
+
+def contact_href(inline, topic=""):
+    """Link to the contact form, optionally preselecting a topic (a membership tier name or 'membership')."""
+    base = href("contact", inline)
+    return f"{base}?topic={topic.lower().replace(' ', '-')}" if topic and not inline else base
+
 def nav(active, inline):
     links = "".join(
         f'<a class="lnk{" on" if key == active else ""}" href="{href(key, inline)}">{label}</a>'
@@ -668,7 +686,7 @@ def nav(active, inline):
     mob = "".join(f'<a href="{href(key, inline)}">{label}</a>' for key, label in NAV_ITEMS)
     return (f'<nav class="nav"><div class="wrap nav-in">'
             f'<a class="brand" href="{href("index", inline)}" aria-label="Froliq home">{LOGO_SVG}</a>'
-            f'{links}<a class="btn btn-grad" href="{TYPEFORM}" rel="noopener">Request a demo</a></div>'
+            f'{links}<a class="btn btn-grad" href="{contact_href(inline)}">Request a demo</a></div>'
             f'<div class="nav-mob wrap">{mob}</div></nav>')
 
 
@@ -779,7 +797,7 @@ def cta_block(inline):
     socials = "".join(f'<a href="{u}" rel="noopener">{n}</a>' for n, u in SOCIALS)
     return (f'<div class="cta"><h2>It\'s Froliq time!</h2>'
             f'<p>Tell us about your facility, your program, or your event — we\'ll bring the headsets.</p>'
-            f'<a class="btn btn-grad" href="{TYPEFORM}" rel="noopener">Request a demo</a>'
+            f'<a class="btn btn-grad" href="{contact_href(inline)}">Request a demo</a>'
             f'<div class="socials">{socials}</div></div>')
 
 # ---------------------------------------------------------------- pages
@@ -799,7 +817,7 @@ def page_index(inline):
       <h1>Step inside the <span class="grad-text">future of energy</span>.</h1>
       <p class="lede">Froliq builds spatial computing experiences — digital twins, immersive training, and educational XR games — for utilities, museums, and communities, turning the most complex systems into places anyone can walk through.</p>
       <div class="hero-cta">
-        <a class="btn btn-grad" href="{TYPEFORM}" rel="noopener">Request a demo</a>
+        <a class="btn btn-grad" href="{contact_href(inline)}">Request a demo</a>
         <a class="btn btn-ghost" href="{href('work', inline)}">See the work</a>
       </div>
     </div>
@@ -930,7 +948,7 @@ def page_member(m, inline):
     </div>
   </div>
   <div class="prose">{prose}</div>
-  <div class="detail-cta"><b>Work with {m["name"].split()[0]} and the team</b><a class="btn btn-grad" href="{TYPEFORM}" rel="noopener">Request a demo</a></div>
+  <div class="detail-cta"><b>Work with {m["name"].split()[0]} and the team</b><a class="btn btn-grad" href="{contact_href(inline)}">Request a demo</a></div>
   <div class="back-row"><a class="arrow-lnk" href="{href('team', inline)}">← The whole team</a><a class="arrow-lnk" href="{href('work', inline)}">See the work →</a></div>
 </div>"""
     return shell(f'{m["name"]} — {m["role"]} | Froliq', body, "team", inline,
@@ -970,7 +988,7 @@ def page_article(a, inline):
   <div class="detail-hero"><img src="{img_src('news', a['img'], inline)}" alt="{a['title']}"></div>
   <div class="prose">{prose}</div>
   <p class="src-note">Originally published at <a href="{a["source"]}" rel="noopener">{a["source"].split("//")[1].split("/")[0]}</a>.</p>
-  <div class="detail-cta"><b>Want Froliq at your next event?</b><a class="btn btn-grad" href="{TYPEFORM}" rel="noopener">Request a demo</a></div>
+  <div class="detail-cta"><b>Want Froliq at your next event?</b><a class="btn btn-grad" href="{contact_href(inline)}">Request a demo</a></div>
   <div class="back-row"><a class="arrow-lnk" href="{href('news', inline)}">← All news</a><a class="arrow-lnk" href="{href('contact', inline)}">Get in touch →</a></div>
 </div>"""
     return shell(f'{a["title"]} | Froliq News', body, "news", inline,
@@ -1012,14 +1030,14 @@ def page_membership(inline):
         f'<p class="price">{t["price"]}<span>/year</span></p>'
         f'<p class="kind">{t["kind"]}</p><p>{t["summary"]}</p>'
         f'<ul>{"".join(f"<li>{x}</li>" for x in t["items"])}</ul>'
-        f'<a class="btn btn-grad" href="{MEMBERSHIP_CONTACT}" rel="noopener">Become a member</a></div>'
+        f'<a class="btn btn-grad" href="{contact_href(inline, t["name"])}">Become a member</a></div>'
         for i, t in enumerate(MEMBERSHIP))
     body = f"""
 <header class="page-head"><div class="wrap">
   <p class="eyebrow">Utility membership</p>
   <h1>Partner with Froliq all year.</h1>
   <p class="sub">Three membership levels for utilities: community outreach, VR/AR experiences, research, and industry events, bundled into one annual partnership.</p>
-  <p style="margin-top:22px"><a class="btn btn-grad" href="{MEMBERSHIP_CONTACT}" rel="noopener">Contact us about membership</a></p>
+  <p style="margin-top:22px"><a class="btn btn-grad" href="{contact_href(inline, 'membership')}">Contact us about membership</a></p>
 </div></header>
 <section style="padding-top:34px"><div class="wrap">
   <div class="tier-grid">{tiers}</div>
@@ -1032,6 +1050,48 @@ def page_membership(inline):
                  path="membership")
 
 
+CONTACT_TOPICS = [("demo", "Request a demo"), ("membership", "Utility membership (not sure which level yet)")] + \
+    [(t["name"].lower().replace(" ", "-"), f"Membership: {t['name']} ({t['price']}/year)") for t in MEMBERSHIP] + \
+    [("project", "A project or partnership"), ("other", "Something else")]
+
+
+def contact_form():
+    opts = "".join(f'<option value="{k}">{label}</option>' for k, label in CONTACT_TOPICS)
+    return f"""<form class="cform" action="{FORM_ENDPOINT}" method="POST">
+  <input type="hidden" name="_subject" value="New message from frlq.co">
+  <input type="hidden" name="_next" value="{SITE_URL}/thanks">
+  <input type="hidden" name="_template" value="table">
+  <input type="hidden" name="_captcha" value="false">
+  <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+  <div class="row2">
+    <label>Name<input name="name" required autocomplete="name"></label>
+    <label>Email<input type="email" name="email" required autocomplete="email"></label>
+  </div>
+  <div class="row2">
+    <label>Organization<input name="organization" autocomplete="organization"></label>
+    <label>What can we help with?<select name="topic" id="topic">{opts}</select></label>
+  </div>
+  <label>Message<textarea name="message" rows="6" required placeholder="Tell us about your facility, your program, or your event."></textarea></label>
+  <button class="btn btn-grad" type="submit">Send message</button>
+  <p class="form-note">Your message goes straight to the Froliq team.</p>
+</form>
+<script>(function(){{var t=new URLSearchParams(location.search).get('topic'),s=document.getElementById('topic');
+if(t&&s&&s.querySelector('option[value="'+t+'"]'))s.value=t;
+var f=document.querySelector('.cform');f.addEventListener('submit',function(){{
+f.querySelector('[name=_subject]').value='frlq.co: '+s.options[s.selectedIndex].text;}});}})();</script>"""
+
+
+def page_thanks(inline):
+    body = f"""
+<header class="page-head"><div class="wrap">
+  <p class="eyebrow">Message sent</p>
+  <h1>Thanks! We got it.</h1>
+  <p class="sub">Your message is with the Froliq team. We'll get back to you soon.</p>
+  <p style="margin-top:22px"><a class="btn btn-grad" href="{href('work', inline)}">See our work</a></p>
+</div></header>"""
+    return shell("Thanks | Froliq", body, "", inline, path="thanks")
+
+
 def page_contact(inline):
     body = f"""
 <header class="page-head"><div class="wrap">
@@ -1039,7 +1099,7 @@ def page_contact(inline):
   <h1>Let's build something people remember.</h1>
   <p class="sub">A facility to scan, a program to gamify, an event that needs a line around the booth — tell us what you're planning.</p>
 </div></header>
-<section style="padding-top:34px"><div class="wrap">{cta_block(inline)}</div></section>"""
+<section style="padding-top:34px"><div class="wrap">{contact_form()}</div></section>"""
     return shell("Contact Froliq | Request a Demo", body, "contact", inline,
                  desc="Talk to Froliq about VR training, digital twins, 3D scanning, or XR for your next event. Austin, TX.",
                  path="contact")
@@ -1072,7 +1132,7 @@ def page_project(p, inline):
   </div>
   {media}
   <div class="prose">{prose}</div>
-  <div class="detail-cta"><b>Want something like this?</b><a class="btn btn-grad" href="{TYPEFORM}" rel="noopener">Request a demo</a></div>
+  <div class="detail-cta"><b>Want something like this?</b><a class="btn btn-grad" href="{contact_href(inline)}">Request a demo</a></div>
   <div class="back-row"><a class="arrow-lnk" href="{back}">{back_label}</a><a class="arrow-lnk" href="{href('contact', inline)}">Get in touch →</a></div>
 </div>"""
     return shell(f'{p["title"]} — {p["client"]} | Froliq', body,
@@ -1087,7 +1147,7 @@ def all_pages():
     pages = {
         "index": page_index, "work": page_work,
         "services": page_services, "team": page_team, "news": page_news,
-        "about": page_about, "contact": page_contact, "membership": page_membership,
+        "about": page_about, "contact": page_contact, "membership": page_membership, "thanks": page_thanks,
     }
     for p in PROJECTS:
         pages[f"project-{p['slug']}"] = (lambda inline, p=p: page_project(p, inline))
@@ -1148,6 +1208,8 @@ def build_preview(pages):
 def build_seo_files(pages):
     urls = []
     for key in pages:
+        if key == "thanks":
+            continue
         loc = SITE_URL + "/" if key == "index" else f"{SITE_URL}/{key}"
         urls.append(f"  <url><loc>{loc}</loc></url>")
     sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
