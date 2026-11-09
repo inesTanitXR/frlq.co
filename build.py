@@ -626,7 +626,7 @@ CAT_OF = {
 for _p in PROJECTS:
     _p["cat"] = CAT_OF.get(_p["slug"], "games")
 
-NAV_ITEMS = [("work", "Work"), ("services", "Services"),
+NAV_ITEMS = [("work", "Work"), ("services", "Services"), ("membership", "Membership"),
              ("team", "Team"), ("news", "News"), ("about", "About"), ("contact", "Contact")]
 
 DEFAULT_DESC = ("Froliq is an Austin XR and spatial computing studio building digital twins, VR safety training, 3D scanning, "
