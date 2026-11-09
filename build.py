@@ -23,10 +23,11 @@ SITE_URL = f"https://{CUSTOM_DOMAIN}"
 LOGO_SVG = open(os.path.join(ASSETS, 'froliq-logo.svg')).read()
 LOGO_SVG = LOGO_SVG.replace('id="Layer_1-534353042"', 'class="logo-mark" aria-hidden="true"')
 
-# Every "Request a demo" / membership button opens the contact form, which FormSubmit
-# delivers to the shared inbox (needs a one-time activation click from that inbox).
+# Every "Request a demo" / membership button opens the contact form, which Web3Forms delivers
+# to the shared inbox. The access key is public by design (it only allows sending to that inbox).
 FORM_EMAIL = "immersivetech@frlq.co"
-FORM_ENDPOINT = "https://formsubmit.co/" + FORM_EMAIL
+FORM_ENDPOINT = "https://api.web3forms.com/submit"
+WEB3FORMS_KEY = "77514cad-8596-489d-8599-0f33d1cc8b3d"
 
 FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">'
 
@@ -162,6 +163,8 @@ section{padding:64px 0}
 .cform button{align-self:flex-start;border:0;cursor:pointer;font-family:inherit}
 .cform .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .form-note{font-size:13.5px;color:var(--muted);margin:0}
+.form-note.err{color:#c4003b;font-size:14.5px}
+.cform button:disabled{opacity:.6;cursor:wait}
 @media(max-width:700px){.cform .row2{grid-template-columns:1fr}}
 
 /* membership */
@@ -1058,11 +1061,11 @@ CONTACT_TOPICS = [("demo", "Request a demo"), ("membership", "Utility membership
 def contact_form():
     opts = "".join(f'<option value="{k}">{label}</option>' for k, label in CONTACT_TOPICS)
     return f"""<form class="cform" action="{FORM_ENDPOINT}" method="POST">
-  <input type="hidden" name="_subject" value="New message from frlq.co">
-  <input type="hidden" name="_next" value="{SITE_URL}/thanks">
-  <input type="hidden" name="_template" value="table">
-  <input type="hidden" name="_captcha" value="false">
-  <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+  <input type="hidden" name="access_key" value="{WEB3FORMS_KEY}">
+  <input type="hidden" name="subject" value="New message from frlq.co">
+  <input type="hidden" name="from_name" value="frlq.co contact form">
+  <input type="hidden" name="redirect" value="{SITE_URL}/thanks">
+  <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
   <div class="row2">
     <label>Name<input name="name" required autocomplete="name"></label>
     <label>Email<input type="email" name="email" required autocomplete="email"></label>
@@ -1073,13 +1076,23 @@ def contact_form():
   </div>
   <label>Message<textarea name="message" rows="6" required placeholder="Tell us about your facility, your program, or your event."></textarea></label>
   <button class="btn btn-grad" type="submit">Send message</button>
-  <p class="form-note">Your message goes straight to the Froliq team.</p>
+  <p class="form-note" id="form-status" role="status">Your message goes straight to the Froliq team.</p>
 </form>
 <script>(function(){{var t=new URLSearchParams(location.search).get('topic'),s=document.getElementById('topic');
 if(t&&s&&s.querySelector('option[value="'+t+'"]'))s.value=t;
-var f=document.querySelector('.cform');f.addEventListener('submit',function(){{
-f.querySelector('[name=_subject]').value='frlq.co: '+s.options[s.selectedIndex].text;}});}})();</script>"""
-
+var f=document.querySelector('.cform'),b=f.querySelector('button'),st=document.getElementById('form-status');
+f.addEventListener('submit',function(e){{
+  e.preventDefault();
+  f.querySelector('[name=subject]').value='frlq.co: '+s.options[s.selectedIndex].text;
+  var data=Object.fromEntries(new FormData(f));data.topic=s.options[s.selectedIndex].text;
+  b.disabled=true;b.textContent='Sending…';st.classList.remove('err');
+  fetch(f.action,{{method:'POST',headers:{{'Content-Type':'application/json',Accept:'application/json'}},body:JSON.stringify(data)}})
+  .then(function(r){{return r.json()}}).then(function(j){{
+    if(j.success){{location.href='/thanks';return}}throw new Error(j.message||'failed')}})
+  .catch(function(){{
+    b.disabled=false;b.textContent='Send message';st.classList.add('err');
+    st.innerHTML='Sorry, that didn\u2019t go through. Please try again, or email us directly at <a href="mailto:{FORM_EMAIL}">{FORM_EMAIL}</a>.'}});
+}});}})();</script>"""
 
 def page_thanks(inline):
     body = f"""

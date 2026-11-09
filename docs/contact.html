@@ -147,6 +147,8 @@ section{padding:64px 0}
 .cform button{align-self:flex-start;border:0;cursor:pointer;font-family:inherit}
 .cform .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .form-note{font-size:13.5px;color:var(--muted);margin:0}
+.form-note.err{color:#c4003b;font-size:14.5px}
+.cform button:disabled{opacity:.6;cursor:wait}
 @media(max-width:700px){.cform .row2{grid-template-columns:1fr}}
 
 /* membership */
@@ -321,12 +323,12 @@ a:focus-visible,.btn:focus-visible{outline:3px solid var(--blue);outline-offset:
   <h1>Let's build something people remember.</h1>
   <p class="sub">A facility to scan, a program to gamify, an event that needs a line around the booth — tell us what you're planning.</p>
 </div></header>
-<section style="padding-top:34px"><div class="wrap"><form class="cform" action="https://formsubmit.co/immersivetech@frlq.co" method="POST">
-  <input type="hidden" name="_subject" value="New message from frlq.co">
-  <input type="hidden" name="_next" value="https://frlq.co/thanks">
-  <input type="hidden" name="_template" value="table">
-  <input type="hidden" name="_captcha" value="false">
-  <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+<section style="padding-top:34px"><div class="wrap"><form class="cform" action="https://api.web3forms.com/submit" method="POST">
+  <input type="hidden" name="access_key" value="77514cad-8596-489d-8599-0f33d1cc8b3d">
+  <input type="hidden" name="subject" value="New message from frlq.co">
+  <input type="hidden" name="from_name" value="frlq.co contact form">
+  <input type="hidden" name="redirect" value="https://frlq.co/thanks">
+  <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
   <div class="row2">
     <label>Name<input name="name" required autocomplete="name"></label>
     <label>Email<input type="email" name="email" required autocomplete="email"></label>
@@ -337,12 +339,23 @@ a:focus-visible,.btn:focus-visible{outline:3px solid var(--blue);outline-offset:
   </div>
   <label>Message<textarea name="message" rows="6" required placeholder="Tell us about your facility, your program, or your event."></textarea></label>
   <button class="btn btn-grad" type="submit">Send message</button>
-  <p class="form-note">Your message goes straight to the Froliq team.</p>
+  <p class="form-note" id="form-status" role="status">Your message goes straight to the Froliq team.</p>
 </form>
 <script>(function(){var t=new URLSearchParams(location.search).get('topic'),s=document.getElementById('topic');
 if(t&&s&&s.querySelector('option[value="'+t+'"]'))s.value=t;
-var f=document.querySelector('.cform');f.addEventListener('submit',function(){
-f.querySelector('[name=_subject]').value='frlq.co: '+s.options[s.selectedIndex].text;});})();</script></div></section>
+var f=document.querySelector('.cform'),b=f.querySelector('button'),st=document.getElementById('form-status');
+f.addEventListener('submit',function(e){
+  e.preventDefault();
+  f.querySelector('[name=subject]').value='frlq.co: '+s.options[s.selectedIndex].text;
+  var data=Object.fromEntries(new FormData(f));data.topic=s.options[s.selectedIndex].text;
+  b.disabled=true;b.textContent='Sending…';st.classList.remove('err');
+  fetch(f.action,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(data)})
+  .then(function(r){return r.json()}).then(function(j){
+    if(j.success){location.href='/thanks';return}throw new Error(j.message||'failed')})
+  .catch(function(){
+    b.disabled=false;b.textContent='Send message';st.classList.add('err');
+    st.innerHTML='Sorry, that didn’t go through. Please try again, or email us directly at <a href="mailto:immersivetech@frlq.co">immersivetech@frlq.co</a>.'});
+});})();</script></div></section>
 <footer><div class="wrap foot"><span>© 2026 Froliq · Austin, TX</span><span><a href="/work">Work</a><a href="/news">News</a><a href="/contact">Contact</a></span></div></footer>
 </body>
 </html>
