@@ -401,8 +401,8 @@ LOGOS = ["smithsonian.png", "oracle.png", "exelon.png", "smud.png", "vistra.png"
 # Utility membership tiers, from Chris Holt's "Froliq Utility Membership Page" doc (Nov 2026).
 MEMBERSHIP_LOGOS = ["austin-energy.png", "cps.png", "bge.png", "comed.png", "vistra.png",
                     "pepco.png", "smud.png", "ameren.png"]
-# Where "Become a member" goes. Swap for the Froliq help inbox once Chris confirms the address.
-MEMBERSHIP_CONTACT = TYPEFORM
+# Where the membership buttons go: Froliq's shared inbox (confirmed with Chris Holt, Nov 2026).
+MEMBERSHIP_CONTACT = "mailto:immersivetech@frlq.co?subject=Froliq%20utility%20membership"
 
 MEMBERSHIP = [
     dict(level="Level 1", name="Community Partner", price="$20,000", kind="Foundational membership",
