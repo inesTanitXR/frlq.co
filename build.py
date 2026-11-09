@@ -150,6 +150,22 @@ section{padding:64px 0}
 .fchip.on{background:var(--grad);color:#fff;border-color:transparent}
 .lib-grid .app[hidden]{display:none}
 
+/* membership */
+.tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start}
+.tier{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px 24px;display:flex;flex-direction:column;gap:8px}
+.tier.tier-top{background:linear-gradient(160deg,var(--purple-soft),var(--card) 45%);border-color:var(--purple)}
+.tier .num{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.tier h3{margin:2px 0 0}
+.tier .price{font-family:"Bricolage Grotesque",sans-serif;font-size:38px;font-weight:700;margin:4px 0 0;line-height:1.1}
+.tier .price span{font-size:15px;font-weight:500;color:var(--muted);margin-left:4px}
+.tier .kind{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--purple);margin:0}
+.tier p{font-size:15.5px;margin:0;color:var(--body)}
+.tier ul{margin:10px 0 18px;padding-left:18px;font-size:14.5px;color:var(--body)}
+.tier li{margin:0 0 7px}
+.tier .btn{align-self:flex-start;margin-top:auto}
+.tier-note{font-size:14px;color:var(--muted);margin:18px 0 0}
+@media(max-width:860px){.tier-grid{grid-template-columns:1fr}}
+
 /* services */
 .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .svc{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px 24px;display:flex;flex-direction:column;gap:8px}
@@ -382,6 +398,54 @@ NEWS = json.load(open(os.path.join(ASSETS, 'news', 'news.json')))
 LOGOS = ["smithsonian.png", "oracle.png", "exelon.png", "smud.png", "vistra.png",
          "ameren.png", "austin-energy.png", "cps.png", "bge.png", "nrel.png", "sew.png"]
 
+# Utility membership tiers, from Chris Holt's "Froliq Utility Membership Page" doc (Nov 2026).
+MEMBERSHIP_LOGOS = ["austin-energy.png", "cps.png", "bge.png", "comed.png", "vistra.png",
+                    "pepco.png", "smud.png", "ameren.png"]
+# Where "Become a member" goes. Swap for the Froliq help inbox once Chris confirms the address.
+MEMBERSHIP_CONTACT = TYPEFORM
+
+MEMBERSHIP = [
+    dict(level="Level 1", name="Community Partner", price="$20,000", kind="Foundational membership",
+         summary="A foundational partnership focused on community outreach, educational engagement, and access to select industry events and VR/AR experiences.",
+         items=["Community outreach and educational program participation throughout the membership year.",
+                "Access to select physical and virtual events.",
+                "Access to existing VR/AR educational experiences.",
+                "Utility branding integration into one existing VR/AR experience.",
+                "Basic subtitle support for selected VR/AR experiences.",
+                "Select annual industry event participation and brand recognition.",
+                "One annual speaking or panel opportunity.",
+                "Access to industry research and thought leadership.",
+                "Select networking opportunities."]),
+    dict(level="Level 2", name="Strategic Partner", price="$40,000", kind="Expanded membership",
+         summary="An expanded partnership combining community outreach, customized VR/AR experiences, research, event participation, and industry thought leadership.",
+         items=["Ongoing VR/AR community outreach and support throughout the membership year.",
+                "Participation in EV education and equity initiatives, including EVs for Schools and EVs for Everyone.",
+                "Ongoing event promotion, education, and DEI outreach support.",
+                "Custom-branded VR/AR experiences.",
+                "Development of up to two customized VR/AR experiences annually.",
+                "Ongoing VR/AR updates and subtitle integration.",
+                "Participation in all designated annual industry events, including ETS and start@ETS.",
+                "Premium digital and physical event branding.",
+                "Minimum of two speaking opportunities annually.",
+                "One customized research paper annually.",
+                "Ongoing industry networking and promotional support."]),
+    dict(level="Level 3", name="Premier Partner", price="$65,000", kind="Premium membership",
+         summary="A comprehensive partnership providing the highest level of visibility, customized experiences, research support, event participation, and year-round strategic engagement.",
+         items=["Comprehensive year-round community outreach and educational support.",
+                "Expanded participation in EV education and equity initiatives.",
+                "Dedicated outreach and promotional support for strategic community initiatives.",
+                "Development of up to two customized VR/AR experiences annually, with expanded customization.",
+                "Ongoing VR/AR updates, enhancements, and subtitle integration.",
+                "Full participation in all designated annual industry events.",
+                "Premier digital and physical branding.",
+                "Minimum of four speaking opportunities annually.",
+                "Up to two customized research papers annually.",
+                "Featured research and thought leadership opportunities.",
+                "Annual strategic planning session.",
+                "Quarterly partnership reviews.",
+                "Priority networking and business development support."]),
+]
+
 SOCIALS = [
     ("LinkedIn", "https://linkedin.com/company/froliqmedia"),
     ("Instagram", "https://instagram.com/froliqmedia"),
@@ -584,16 +648,17 @@ ORG_LD = json.dumps({
 
 def img_src(folder, fname, inline):
     if not inline:
-        return f"assets/{folder}/{fname}"
+        return f"/assets/{folder}/{fname}"
     raw = open(os.path.join(ASSETS, folder, fname), 'rb').read()
     mime = mimetypes.guess_type(fname)[0] or 'image/jpeg'
     return f"data:{mime};base64," + base64.b64encode(raw).decode()
 
 
 def href(page, inline):
+    # Clean URLs: GitHub Pages serves /about from about.html, so links never show ".html".
     if page == "index":
-        return "#/" if inline else "index.html"
-    return f"#/{page}" if inline else f"{page}.html"
+        return "#/" if inline else "/"
+    return f"#/{page}" if inline else f"/{page}"
 
 
 def nav(active, inline):
@@ -703,10 +768,10 @@ def news_card(a, inline):
             f'<div class="body"><time datetime="{d}">{d}</time><b>{a["title"]}</b></div></a>')
 
 
-def logo_strip(inline, label="Trusted by"):
+def logo_strip(inline, label="Trusted by", logos=None):
     chips = "".join(
         f'<div class="logo-chip"><img src="{img_src("logos", l, inline)}" alt="{l.rsplit(".",1)[0].replace("-"," ").title()} logo" loading="lazy"></div>'
-        for l in LOGOS)
+        for l in (logos or LOGOS))
     return f'<div class="clients"><div class="wrap"><p class="label">{label}</p><div class="logo-row">{chips}</div></div></div>'
 
 
@@ -802,7 +867,7 @@ sel(['twins','games','training','education','films'].indexOf(h)>=0?h:'all');
 }})()</script>"""
     return shell("XR Projects for Utilities & Museums | Froliq", body, "work", inline,
                  desc="Digital twins, VR facility tours, training sims, and energy-education games built with the Smithsonian, Oracle, Exelon, SMUD, Vistra, and more.",
-                 path="work.html")
+                 path="work")
 
 
 def page_services(inline):
@@ -825,7 +890,7 @@ def page_services(inline):
 <section><div class="wrap">{cta_block(inline)}</div></section>"""
     return shell("Digital Twins, VR Training & 3D Scanning Services | Froliq", body, "services", inline,
                  desc="Froliq's services: digital twins and VR facility tours, 3D scanning and reality capture, educational XR games, spatial and AR live-data experiences, and event outreach.",
-                 path="services.html")
+                 path="services")
 
 
 def page_team(inline):
@@ -840,7 +905,7 @@ def page_team(inline):
 <section><div class="wrap">{cta_block(inline)}</div></section>"""
     return shell("Meet the Team | Froliq", body, "team", inline,
                  desc="The Froliq team: XR developers, 3D artists, creative leads, and client partners building VR and AR for energy and education in Austin, TX.",
-                 path="team.html")
+                 path="team")
 
 
 def page_member(m, inline):
@@ -852,7 +917,7 @@ def page_member(m, inline):
         "@context": "https://schema.org", "@type": "Person",
         "name": m["name"], "jobTitle": m["role"],
         "worksFor": {"@type": "Organization", "name": "Froliq", "url": SITE_URL},
-        "url": f"{SITE_URL}/team-{m['slug']}.html",
+        "url": f"{SITE_URL}/team-{m['slug']}",
         "sameAs": [u for _, u in m["links"]],
     })
     body = f"""
@@ -869,7 +934,7 @@ def page_member(m, inline):
   <div class="back-row"><a class="arrow-lnk" href="{href('team', inline)}">← The whole team</a><a class="arrow-lnk" href="{href('work', inline)}">See the work →</a></div>
 </div>"""
     return shell(f'{m["name"]} — {m["role"]} | Froliq', body, "team", inline,
-                 desc=m["paras"][0][:155], path=f"team-{m['slug']}.html", extra_ld=person_ld)
+                 desc=m["paras"][0][:155], path=f"team-{m['slug']}", extra_ld=person_ld)
 
 
 def page_news(inline):
@@ -883,7 +948,7 @@ def page_news(inline):
 <section style="padding-top:34px"><div class="wrap"><div class="news-grid">{cards}</div></div></section>"""
     return shell("News & Events | Froliq", body, "news", inline,
                  desc="Froliq news: Oracle AR launches, the Smithsonian FUTURES exhibit, SXSW, and more from the Austin XR studio for energy and education.",
-                 path="news.html")
+                 path="news")
 
 
 def page_article(a, inline):
@@ -894,7 +959,7 @@ def page_article(a, inline):
         "headline": a["title"], "datePublished": d,
         "image": f"{SITE_URL}/assets/news/{a['img']}",
         "publisher": {"@type": "Organization", "name": "Froliq", "url": SITE_URL},
-        "mainEntityOfPage": f"{SITE_URL}/news-{a['slug']}.html",
+        "mainEntityOfPage": f"{SITE_URL}/news-{a['slug']}",
     })
     body = f"""
 <div class="detail">
@@ -909,7 +974,7 @@ def page_article(a, inline):
   <div class="back-row"><a class="arrow-lnk" href="{href('news', inline)}">← All news</a><a class="arrow-lnk" href="{href('contact', inline)}">Get in touch →</a></div>
 </div>"""
     return shell(f'{a["title"]} | Froliq News', body, "news", inline,
-                 desc=(a["desc"] or a["paras"][0])[:155], path=f"news-{a['slug']}.html",
+                 desc=(a["desc"] or a["paras"][0])[:155], path=f"news-{a['slug']}",
                  og_image=f"{SITE_URL}/assets/news/{a['img']}", extra_ld=art_ld)
 
 
@@ -937,7 +1002,34 @@ def page_about(inline):
 <section><div class="wrap">{cta_block(inline)}</div></section>"""
     return shell("About Froliq | Austin XR Studio", body, "about", inline,
                  desc="Froliq is Zpryme's XR and spatial computing studio in Austin, TX — building VR, AR, and Apple Vision Pro experiences for clean-energy workforce development, education, and community outreach.",
-                 path="about.html")
+                 path="about")
+
+
+def page_membership(inline):
+    tiers = "".join(
+        f'<div class="tier{" tier-top" if i == len(MEMBERSHIP) - 1 else ""}">'
+        f'<span class="num">{t["level"]}</span><h3>{t["name"]}</h3>'
+        f'<p class="price">{t["price"]}<span>/year</span></p>'
+        f'<p class="kind">{t["kind"]}</p><p>{t["summary"]}</p>'
+        f'<ul>{"".join(f"<li>{x}</li>" for x in t["items"])}</ul>'
+        f'<a class="btn btn-grad" href="{MEMBERSHIP_CONTACT}" rel="noopener">Become a member</a></div>'
+        for i, t in enumerate(MEMBERSHIP))
+    body = f"""
+<header class="page-head"><div class="wrap">
+  <p class="eyebrow">Utility membership</p>
+  <h1>Partner with Froliq all year.</h1>
+  <p class="sub">Three membership levels for utilities: community outreach, VR/AR experiences, research, and industry events, bundled into one annual partnership.</p>
+  <p style="margin-top:22px"><a class="btn btn-grad" href="{MEMBERSHIP_CONTACT}" rel="noopener">Contact us about membership</a></p>
+</div></header>
+<section style="padding-top:34px"><div class="wrap">
+  <div class="tier-grid">{tiers}</div>
+  <p class="tier-note">All deliverables are based on a 12-month membership period.</p>
+</div></section>
+<div style="height:56px"></div>
+{logo_strip(inline, label="Trusted members", logos=MEMBERSHIP_LOGOS)}"""
+    return shell("Utility Membership | Froliq", body, "membership", inline,
+                 desc="Froliq utility membership: Community Partner, Strategic Partner, and Premier Partner levels for community outreach, VR/AR experiences, research, and industry events.",
+                 path="membership")
 
 
 def page_contact(inline):
@@ -950,7 +1042,7 @@ def page_contact(inline):
 <section style="padding-top:34px"><div class="wrap">{cta_block(inline)}</div></section>"""
     return shell("Contact Froliq | Request a Demo", body, "contact", inline,
                  desc="Talk to Froliq about VR training, digital twins, 3D scanning, or XR for your next event. Austin, TX.",
-                 path="contact.html")
+                 path="contact")
 
 
 def page_project(p, inline):
@@ -985,7 +1077,7 @@ def page_project(p, inline):
 </div>"""
     return shell(f'{p["title"]} — {p["client"]} | Froliq', body,
                  "work", inline,
-                 desc=p["card"][:155], path=f"project-{p['slug']}.html",
+                 desc=p["card"][:155], path=f"project-{p['slug']}",
                  og_image=f"{SITE_URL}/assets/{f}/{fn}")
 
 # ---------------------------------------------------------------- build
@@ -995,7 +1087,7 @@ def all_pages():
     pages = {
         "index": page_index, "work": page_work,
         "services": page_services, "team": page_team, "news": page_news,
-        "about": page_about, "contact": page_contact,
+        "about": page_about, "contact": page_contact, "membership": page_membership,
     }
     for p in PROJECTS:
         pages[f"project-{p['slug']}"] = (lambda inline, p=p: page_project(p, inline))
@@ -1056,7 +1148,7 @@ def build_preview(pages):
 def build_seo_files(pages):
     urls = []
     for key in pages:
-        loc = SITE_URL + "/" if key == "index" else f"{SITE_URL}/{key}.html"
+        loc = SITE_URL + "/" if key == "index" else f"{SITE_URL}/{key}"
         urls.append(f"  <url><loc>{loc}</loc></url>")
     sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
                '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -1085,10 +1177,10 @@ def main():
     # apps.html merged into work.html — keep old links alive with a redirect
     open(os.path.join(OUT, 'apps.html'), 'w').write(
         '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
-        '<meta http-equiv="refresh" content="0;url=work.html#library">'
-        f'<link rel="canonical" href="{SITE_URL}/work.html">'
+        '<meta http-equiv="refresh" content="0;url=/work#library">'
+        f'<link rel="canonical" href="{SITE_URL}/work">'
         '<title>Froliq Work</title></head>'
-        '<body><p>The app library moved — <a href="work.html#library">see all work</a>.</p></body></html>')
+        '<body><p>The app library moved — <a href="/work#library">see all work</a>.</p></body></html>')
     build_seo_files(pages)
     build_preview(pages)
     print(f"built {len(pages)} pages -> docs/ (+404, sitemap, robots), plus preview.html")
