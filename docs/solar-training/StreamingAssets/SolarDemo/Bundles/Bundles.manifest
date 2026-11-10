@@ -1,0 +1,13 @@
+ManifestFileVersion: 0
+CRC: 3997197116
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: solarhometour
+      Dependencies: {}
+    Info_1:
+      Name: solarinstallation
+      Dependencies: {}
+    Info_2:
+      Name: solarsafety
+      Dependencies: {}

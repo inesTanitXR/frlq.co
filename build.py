@@ -534,6 +534,16 @@ PROJECTS = [
              "We took next-generation scanning to the Davis-Besse nuclear power plant, capturing the turbine deck, cooling tower, and other facilities with PortalCam.",
              "The scans process into an explorable 3D model — basically a 3D photo of the facility that you can step inside.",
              "From there, it can be built out on web, VR, or AR — whatever fits — for training and visual simulation."]),
+    dict(slug="solar-installer-training", featured=True,
+         client="Florida Clean Energy Pathways", title="Solar Installer Training", xr="WEB",
+         img=("featured", "solar-installer.jpg"), detail_img=("featured", "solar-installer-safety.jpg"),
+         app_url="/solar-training/",
+         card="A browser-based training module for solar installers: a home tour, the installation itself, and a pre-installation safety check.",
+         pills=["Runs in the browser", "3 modules"],
+         paras=[
+             "A solar installer training module, part of the Florida Clean Energy Pathways. It runs right in the web browser, so trainees can start without a headset or a download.",
+             "Three modules walk through the job step by step, with narration: a Solar Foundation Home Tour, the Solar Installation itself, and a Pre-Installation Safety Assessment that starts with putting on the right protective gear.",
+             "Best on a computer. The first load downloads the training content, so give it a moment."]),
     # ------- app library -------
     dict(slug="recyclotopia", client="National Energy Foundation", title="Recyclotopia", xr="VR",
          img=("work", "recyclotopia.jpg"), video="fhi4HOKOqMg",
@@ -631,7 +641,7 @@ CATS = [("twins", "Digital twins & tours"), ("games", "Games"), ("training", "Tr
         ("education", "Education & outreach"), ("films", "Films & labs")]
 CAT_OF = {
     "vistra-midlothian": "twins", "smud-hydropower": "twins", "davis-besse-scan": "twins",
-    "oracle-connected-hub": "twins",
+    "oracle-connected-hub": "twins", "solar-installer-training": "training",
     "transmission-line-repair": "training", "bucket-truck": "training",
     "lineman-challenge": "training", "pole-climbing": "training",
     "smithsonian-futures": "education", "exelon-stem": "education",
@@ -1131,17 +1141,21 @@ def page_project(p, inline):
                      f'title="{p["title"]} — video" loading="lazy" allowfullscreen '
                      f'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>')
     else:
-        media = f'<div class="detail-hero"><img src="{img_src(f, fn, inline)}" alt="{p["title"]}"></div>'
+        df, dfn = p.get("detail_img", p["img"])
+        media = f'<div class="detail-hero"><img src="{img_src(df, dfn, inline)}" alt="{p["title"]}"></div>'
     back = href("work", inline)
     if not p.get("featured") and not inline:
         back += "#library"
     back_label = "← All work"
+    launch = (f'<p style="margin-top:18px"><a class="btn btn-grad" href="{p["app_url"]}" target="_blank" rel="noopener">Launch the app ↗</a></p>'
+              if p.get("app_url") else "")
     body = f"""
 <div class="detail">
   <div class="detail-head">
     <p class="eyebrow">{p["client"]} · {p["xr"]}</p>
     <h1>{p["title"]}</h1>
     <div class="pills">{pills}</div>
+    {launch}
   </div>
   {media}
   <div class="prose">{prose}</div>
@@ -1242,6 +1256,10 @@ def main():
     os.remove(os.path.join(OUT, 'assets', 'news', 'news.json'))
     shutil.copy(os.path.join(ASSETS, 'froliq-logo.svg'), os.path.join(OUT, 'assets'))
     shutil.copy(os.path.join(ASSETS, 'og.png'), os.path.join(OUT, 'assets'))
+    # Hosted web apps (Unity WebGL builds) live in apps/<name>/ and are served at /<name>/.
+    for app in sorted(os.listdir(os.path.join(ROOT, 'apps'))):
+        if os.path.isdir(os.path.join(ROOT, 'apps', app)):
+            shutil.copytree(os.path.join(ROOT, 'apps', app), os.path.join(OUT, app))
     open(os.path.join(OUT, 'CNAME'), 'w').write(CUSTOM_DOMAIN + '\n')
 
     pages = all_pages()
