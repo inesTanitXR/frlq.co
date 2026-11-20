@@ -544,6 +544,16 @@ PROJECTS = [
              "A solar installer training module, part of the Florida Clean Energy Pathways. It runs right in the web browser, so trainees can start without a headset or a download.",
              "Three modules walk through the job step by step, with narration: a Solar Foundation Home Tour, the Solar Installation itself, and a Pre-Installation Safety Assessment that starts with putting on the right protective gear.",
              "Best on a computer. The first load downloads the training content, so give it a moment."]),
+    dict(slug="weatherization-training", featured=True,
+         client="Field Training", title="Weatherization Training", xr="WEB",
+         img=("featured", "weatherization.jpg"), detail_img=("featured", "weatherization-menu.jpg"),
+         app_url="/weatherization-training/",
+         card="Browser-based weatherization training: insulate ducts, attics, and pipes, then find heat leaks with a thermal camera.",
+         pills=["Runs in the browser", "4 modules"],
+         paras=[
+             "A weatherization field training that runs right in the web browser, with a mouse and keyboard. No headset required.",
+             "Four modules cover the core jobs: Duct Insulation (wrap and seal supply and return ducts), Attic Insulation (fill the cavity to the target depth), Pipe Insulation (measure, cut, and fit pipe wrap), and Thermal Camera (scan the building and find where heat is leaking out).",
+             "Best on a computer. The first load downloads the training content, so give it a moment."]),
     # ------- app library -------
     dict(slug="recyclotopia", client="National Energy Foundation", title="Recyclotopia", xr="VR",
          img=("work", "recyclotopia.jpg"), video="fhi4HOKOqMg",
@@ -641,7 +651,7 @@ CATS = [("twins", "Digital twins & tours"), ("games", "Games"), ("training", "Tr
         ("education", "Education & outreach"), ("films", "Films & labs")]
 CAT_OF = {
     "vistra-midlothian": "twins", "smud-hydropower": "twins", "davis-besse-scan": "twins",
-    "oracle-connected-hub": "twins", "solar-installer-training": "training",
+    "oracle-connected-hub": "twins", "solar-installer-training": "training", "weatherization-training": "training",
     "transmission-line-repair": "training", "bucket-truck": "training",
     "lineman-challenge": "training", "pole-climbing": "training",
     "smithsonian-futures": "education", "exelon-stem": "education",
