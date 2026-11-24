@@ -651,6 +651,19 @@ PROJECTS = [
 # Library categories: every project gets one; used by the filter chips on the Work page.
 CATS = [("twins", "Digital twins & tours"), ("games", "Games"), ("training", "Training sims"),
         ("education", "Education & outreach"), ("films", "Films & labs")]
+# Display order (Mark Ishac, Nov 2026: utility clients and workforce training first, about 50/50
+# with student-facing work). Projects not listed keep their PROJECTS order after these.
+HOME_FEATURED = ["vistra-midlothian", "solar-installer-training", "oracle-connected-hub", "smithsonian-futures"]
+WORK_FEATURED = ["smithsonian-futures", "vistra-midlothian", "solar-installer-training", "oracle-connected-hub",
+                 "weatherization-training", "davis-besse-scan", "smud-hydropower", "exelon-stem", "nef-minigames"]
+HOME_NEWS = ["clean-energy-academy", "ace-celerate", "oracle-outage-ar"]
+
+
+def ordered(items, order, key="slug"):
+    rank = {k: i for i, k in enumerate(order)}
+    return sorted(items, key=lambda x: rank.get(x[key], len(order)))
+
+
 CAT_OF = {
     "vistra-midlothian": "twins", "smud-hydropower": "twins", "davis-besse-scan": "twins",
     "oracle-connected-hub": "twins", "solar-installer-training": "training", "weatherization-training": "training",
@@ -837,12 +850,13 @@ def cta_block(inline):
 # ---------------------------------------------------------------- pages
 
 def page_index(inline):
-    featured = [p for p in PROJECTS if p.get("featured")]
-    teaser = "".join(work_card(p, inline) for p in featured[:4])
+    by_slug = {p["slug"]: p for p in PROJECTS}
+    teaser = "".join(work_card(by_slug[s], inline) for s in HOME_FEATURED)
     svc = "".join(
         f'<div class="svc"><span class="num">S{i}</span><h3>{t}</h3><p>{d}</p><span class="tag">{tag}</span></div>'
         for i, (t, d, tag) in enumerate(SERVICES[:3], 1))
-    news = "".join(news_card(a, inline) for a in NEWS[:3])
+    news_by_slug = {a["slug"]: a for a in NEWS}
+    news = "".join(news_card(news_by_slug[s], inline) for s in HOME_NEWS)
     body = f"""
 <header class="hero"><div class="wrap">
   <div class="hero-grid">
@@ -892,7 +906,7 @@ def page_index(inline):
 
 
 def page_work(inline):
-    featured = [p for p in PROJECTS if p.get("featured")]
+    featured = ordered([p for p in PROJECTS if p.get("featured")], WORK_FEATURED)
     cards = "".join(work_card(p, inline, hero=p.get("hero_card", False)) for p in featured)
     lib_cards = "".join(app_card(p, inline) for p in PROJECTS)
     chips = '<button class="fchip" data-cat="all" type="button">All</button>' + "".join(
