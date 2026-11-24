@@ -413,7 +413,9 @@ TEAM = [
 NEWS = json.load(open(os.path.join(ASSETS, 'news', 'news.json')))
 
 LOGOS = ["smithsonian.png", "oracle.png", "exelon.png", "smud.png", "vistra.png",
-         "ameren.png", "austin-energy.png", "cps.png", "bge.png", "nrel.png", "sew.png"]
+         "ameren.png", "austin-energy.png", "cps.png", "bge.png", "comed.png", "pepco.png",
+         "peco.png", "ace.png", "delmarva.png", "nypa.png", "coned.png", "willdan.png",
+         "austin-fc.png", "e4.png", "nef.png", "nrel.png", "sew.png"]
 
 # Utility membership tiers, from Chris Holt's "Froliq Utility Membership Page" doc (Nov 2026).
 MEMBERSHIP_LOGOS = ["austin-energy.png", "cps.png", "bge.png", "comed.png", "vistra.png",
@@ -809,9 +811,18 @@ def news_card(a, inline):
             f'<div class="body"><time datetime="{d}">{d}</time><b>{a["title"]}</b></div></a>')
 
 
+LOGO_NAMES = {"ace": "Atlantic City Electric", "nypa": "New York Power Authority", "coned": "Con Edison",
+              "bge": "BGE", "cps": "CPS Energy", "comed": "ComEd", "peco": "PECO", "smud": "SMUD",
+              "nrel": "NREL", "sew": "SEW", "austin-fc": "Austin FC", "e4": "E4 Youth", "nef": "National Energy Foundation"}
+
+
+def logo_name(fname):
+    key = fname.rsplit(".", 1)[0]
+    return LOGO_NAMES.get(key, key.replace("-", " ").title())
+
 def logo_strip(inline, label="Trusted by", logos=None):
     chips = "".join(
-        f'<div class="logo-chip"><img src="{img_src("logos", l, inline)}" alt="{l.rsplit(".",1)[0].replace("-"," ").title()} logo" loading="lazy"></div>'
+        f'<div class="logo-chip"><img src="{img_src("logos", l, inline)}" alt="{logo_name(l)} logo" loading="lazy"></div>'
         for l in (logos or LOGOS))
     return f'<div class="clients"><div class="wrap"><p class="label">{label}</p><div class="logo-row">{chips}</div></div></div>'
 
@@ -852,10 +863,10 @@ def page_index(inline):
     </div>
   </div>
   <div class="stats">
-    <div class="stat"><b>10,000</b><span>guests through our Smithsonian VR experience</span></div>
-    <div class="stat"><b>6</b><span>Exelon utilities in our five-year STEM program</span></div>
-    <div class="stat"><b>180K</b><span>annual museum visitors reached with SMUD</span></div>
-    <div class="stat"><b>12+</b><span>XR apps shipped for energy &amp; education</span></div>
+    <div class="stat"><b>10,000+</b><span>immersive energy learning experiences delivered</span></div>
+    <div class="stat"><b>5 Years</b><span>enterprise-scale learning across Exelon's utility network</span></div>
+    <div class="stat"><b>180K</b><span>annual reach through utility-powered community engagement</span></div>
+    <div class="stat"><b>4 Platforms</b><span>scalable immersive learning across VR, AR, desktop and mobile</span></div>
   </div>
 </div></header>
 {logo_strip(inline)}
@@ -894,8 +905,8 @@ def page_work(inline):
 </div></header>
 <section style="padding-top:34px"><div class="wrap"><div class="work-grid">{cards}</div></div></section>
 <section style="padding-top:0" id="library"><div class="wrap">
-  <div class="sec-head"><p class="eyebrow">The full library</p><h2>Everything we've shipped.</h2>
-  <p>All {len(PROJECTS)} projects in one place — filter by type, click through for the full story.</p></div>
+  <div class="sec-head"><p class="eyebrow">The full library</p><h2>Built to transform.</h2>
+  <p>Designed to scale. Explore how we're turning bold ideas into scalable technologies, immersive experiences, and solutions built for real-world impact.</p></div>
   <div class="filters">{chips}</div>
   <div class="lib-grid" id="lib">{lib_cards}</div>
 </div></section>
